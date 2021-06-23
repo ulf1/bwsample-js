@@ -1,0 +1,32 @@
+{
+  "name": "bwsample",
+  "version": "0.1.0",
+  "description": "The JS implementation of the pypi package bwsample",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satzbeleg/bwsample-js.git"
+  },
+  "keywords": [
+    "ranking",
+    "ranking",
+    "pairwise-comparison",
+    "best-worst-scaling",
+    "logical-inference",
+    "extracting-pairs",
+    "sampling-algorithm",
+    "bws-sets"
+  ],
+  "author": "Ulf Hamster",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/satzbeleg/bwsample-js/issues"
+  },
+  "homepage": "https://github.com/satzbeleg/bwsample-js#readme",
+  "devDependencies": {
+    "mocha": "^9.0.1"
+  }
+}
