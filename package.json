@@ -4,7 +4,7 @@
   "description": "The JS implementation of the pypi package bwsample",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,6 @@
   },
   "homepage": "https://github.com/satzbeleg/bwsample-js#readme",
   "devDependencies": {
-    "mocha": "^9.0.1"
+    "jest": "^27.0.5"
   }
 }
