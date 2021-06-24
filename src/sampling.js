@@ -136,7 +136,7 @@ const indices_overlap = (n_sets,
                          shuffle = true) => {
     // abort
     if(n_items < 2){
-      console.log("Warning: No overlap possible with n_items={n_items}.")
+      console.log(`Warning: No overlap possible with n_items=${n_items}.`)
       return [ [], 0 ]
     }
     if(n_sets < 1){
@@ -148,9 +148,9 @@ const indices_overlap = (n_sets,
       if (shuffle === true){
         var arr = [...Array(n_items).keys()];
         arr.sort(() => (Math.random() > .5) ? 1 : -1);
-        return [ arr, n_items ]
+        return [ [arr], n_items ]
       }else{
-        return [ [...Array(n_items).keys()], n_items ]
+        return [ [[...Array(n_items).keys()]], n_items ]
       }
     }
     // compute required number of examples
