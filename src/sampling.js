@@ -24,9 +24,9 @@ const sample = (examples,
     // Generate BWS sets
     const n_sets = Math.trunc(examples.length / (n_items - 1))
     if (method === 'overlap'){
-        const {bwsindices, n_examples} = indices_overlap(n_sets, n_items, shuffle);
+        const [ bwsindices, n_examples ] = indices_overlap(n_sets, n_items, shuffle);
     }else if (method === 'twice'){
-        const {bwsindices, n_examples} = indices_twice(n_sets, n_items, shuffle);
+        const [ bwsindices, n_examples ] = indices_twice(n_sets, n_items, shuffle);
     }else{
         throw new Error(`method='${method}' not available.`)
     }
@@ -137,20 +137,20 @@ const indices_overlap = (n_sets,
     // abort
     if(n_items < 2){
       console.log("Warning: No overlap possible with n_items={n_items}.")
-      return [], 0
+      return [ [], 0 ]
     }
     if(n_sets < 1){
       console.log("Warning: Zero BWS sets requested.")
-      return [], 0
+      return [ [], 0 ]
     }
     if(n_sets == 1){
       console.log("Warning: Only one BWS set requested.")
       if (shuffle === true){
         var arr = [...Array(n_items).keys()];
         arr.sort(() => (Math.random() > .5) ? 1 : -1);
-        return arr, n_items
+        return [ arr, n_items ]
       }else{
-        return [...Array(n_items).keys()], n_items
+        return [ [...Array(n_items).keys()], n_items ]
       }
     }
     // compute required number of examples
@@ -172,7 +172,7 @@ const indices_overlap = (n_sets,
     }
 
     // done
-    return { bwsindices, n_examples }
+    return [ bwsindices, n_examples ]
 }
 
 
@@ -195,10 +195,10 @@ const indices_twice = (n_sets,
                        n_items,
                        shuffle = true) => {
     // (A) Call `indices_overlap` without randomness!
-    const {bwsindices, n_examples} = indices_overlap(n_sets, n_items, False);
+    const [ bwsindices, n_examples ] = indices_overlap(n_sets, n_items, False);
 
     if (n_items <= 2 && n_sets <= 1){
-        return {bwsindices, n_examples}
+        return [ bwsindices, n_examples ]
     }
 
     // (B) Add BWS sets so that every index is used twice --
@@ -235,11 +235,12 @@ const indices_twice = (n_sets,
     }
 
     // done
-    return { bwsindices, n_examples }
+    return [ bwsindices, n_examples ]
 }
 
 
 module.exports = {
   sample,
-  shuffle_subarrs
+  shuffle_subarrs,
+  indices_overlap
 };

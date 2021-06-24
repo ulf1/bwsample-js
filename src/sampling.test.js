@@ -1,4 +1,5 @@
-const { shuffle_subarrs } = require('./sampling');
+const { shuffle_subarrs, indices_overlap } = require('./sampling');
+
 
 test('shuffle_subarrs test 1/2', () => {
   // scenario
@@ -25,3 +26,63 @@ test('shuffle_subarrs test 2/2', () => {
     }
   }
 });
+
+
+test('indices_overlap test 1/11', () => {
+  // read log output
+  const consoleSpy = jest.spyOn(console, 'log');
+  // scenario
+  const n_sets = 0;
+  const n_items = 0;
+  const shuffle = undefined;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices.length).toBe(0);
+  expect(n_examples).toBe(0);
+  expect(consoleSpy).toHaveBeenCalledWith('Warning: No overlap possible with n_items=0.');
+});
+
+/*
+test('indices_overlap test 2/11', () => {
+});
+
+
+test('indices_overlap test 3/11', () => {
+});
+
+
+
+test('indices_overlap test 4/11', () => {
+});
+
+
+test('indices_overlap test 5/11', () => {
+});
+
+
+
+test('indices_overlap test 6/11', () => {
+});
+
+
+test('indices_overlap test 7/11', () => {
+});
+
+
+
+test('indices_overlap test 8/11', () => {
+});
+
+
+
+test('indices_overlap test 9/11', () => {
+});
+
+
+
+test('indices_overlap test 10/11', () => {
+});
+
+test('indices_overlap test 11/11', () => {
+});
+*/
