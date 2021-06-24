@@ -240,5 +240,6 @@ const indices_twice = (n_sets,
 
 
 module.exports = {
-  sample
+  sample,
+  shuffle_subarrs
 };
