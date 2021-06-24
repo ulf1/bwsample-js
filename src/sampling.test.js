@@ -242,7 +242,7 @@ test('indices_twice test 6/6', () => {
 
 
 
-test('sample test 1/6', () => {
+test('sample test 1/5', () => {
   // read log output
   const consoleSpy = jest.spyOn(console, 'log');
   // scenario
@@ -253,4 +253,91 @@ test('sample test 1/6', () => {
   // check
   expect(samples.length).toBe(0);
   expect(consoleSpy).toHaveBeenCalledWith('Warning: Zero BWS sets requested.');
-})
+});
+
+test('sample test 2/5', () => {
+  // scenario
+  const n_items = 4;
+  const shuffle = false;
+  examples = ['a', 'b'];
+  const samples = sample(examples, n_items, 'overlap', shuffle);
+  // check
+  expect(samples.length).toBe(0);
+});
+
+test('sample test 3/5', () => {
+  // scenario
+  const n_items = 2;
+  const method = 'overlap';
+  const shuffle = false;
+  examples = [...Array(100).keys()];
+  const samples = sample(examples, n_items, method, shuffle);
+  // check
+  // count each item
+  var cnt = {}
+  samples.forEach(list => {
+    list.forEach(elem => {
+      cnt[elem] = (cnt[elem] || 0) + 1
+    })
+  });
+  cnt = Object.keys(cnt).map(key => cnt[key]);  // json values to array
+  // check
+  for(var c of cnt){
+    expect(c).toBe(2);
+  }
+  expect(samples.length).toBe( Math.trunc(examples.length / (n_items - 1)) );
+});
+
+test('sample test 4/5', () => {
+  // scenario
+  const n_items = 3;
+  const method = 'overlap';
+  const shuffle = false;
+  examples = [...Array(100).keys()];
+  const samples = sample(examples, n_items, method, shuffle);
+  // check
+  // count each item
+  var cnt = {}
+  samples.forEach(list => {
+    list.forEach(elem => {
+      cnt[elem] = (cnt[elem] || 0) + 1
+    })
+  });
+  cnt = Object.keys(cnt).map(key => cnt[key]);  // json values to array
+  // check
+  var n1 = 0;
+  var n2 = 0;
+  for(var c of cnt){
+    if (c == 1){
+      n1 += 1;
+    }else if (c == 2){
+      n2 += 1;
+    }
+  }
+  expect(n1).toBe(50);
+  expect(n2).toBe(50);
+  expect(samples.length).toBe( Math.trunc(examples.length / (n_items - 1)) );
+});
+
+test('sample test 5/5', () => {
+  // scenario
+  const n_items = 3;
+  const method = 'twice';
+  const shuffle = false;
+  examples = [...Array(90).keys()];
+  const samples = sample(examples, n_items, method, shuffle);
+  // check
+  // count each item
+  var cnt = {}
+  samples.forEach(list => {
+    list.forEach(elem => {
+      cnt[elem] = (cnt[elem] || 0) + 1
+    })
+  });
+  cnt = Object.keys(cnt).map(key => cnt[key]);  // json values to array
+  console.log(cnt)
+  // check
+  for(var c of cnt){
+    expect(c).toBe(2);
+  }
+});
