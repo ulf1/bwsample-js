@@ -23,10 +23,11 @@ const sample = (examples,
                 shuffle = true) => {
     // Generate BWS sets
     const n_sets = Math.trunc(examples.length / (n_items - 1))
+    var bwsindices;
     if (method === 'overlap'){
-        const [ bwsindices, n_examples ] = indices_overlap(n_sets, n_items, shuffle);
+        bwsindices = indices_overlap(n_sets, n_items, shuffle)[0];
     }else if (method === 'twice'){
-        const [ bwsindices, n_examples ] = indices_twice(n_sets, n_items, shuffle);
+        bwsindices = indices_twice(n_sets, n_items, shuffle)[0];
     }else{
         throw new Error(`method='${method}' not available.`)
     }

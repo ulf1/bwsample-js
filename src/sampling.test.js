@@ -1,4 +1,4 @@
-const { shuffle_subarrs, indices_overlap, indices_twice } = require('./sampling');
+const { shuffle_subarrs, indices_overlap, indices_twice, sample } = require('./sampling');
 
 
 test('shuffle_subarrs test 1/2', () => {
@@ -239,3 +239,18 @@ test('indices_twice test 6/6', () => {
   })
   expect(n_examples).toBe( n_sets * (n_items - 1) );
 });
+
+
+
+test('sample test 1/6', () => {
+  // read log output
+  const consoleSpy = jest.spyOn(console, 'log');
+  // scenario
+  const n_items = 5;
+  const shuffle = false;
+  examples = ['a'];
+  const samples = sample(examples, n_items, 'overlap', shuffle);
+  // check
+  expect(samples.length).toBe(0);
+  expect(consoleSpy).toHaveBeenCalledWith('Warning: Zero BWS sets requested.');
+})
