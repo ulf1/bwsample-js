@@ -28,7 +28,7 @@ test('shuffle_subarrs test 2/2', () => {
 });
 
 
-test('indices_overlap test 1/11', () => {
+test('indices_overlap test 1/10', () => {
   // read log output
   const consoleSpy = jest.spyOn(console, 'log');
   // scenario
@@ -43,7 +43,7 @@ test('indices_overlap test 1/11', () => {
 });
 
 
-test('indices_overlap test 2/11', () => {
+test('indices_overlap test 2/10', () => {
   // read log output
   const consoleSpy = jest.spyOn(console, 'log');
   // scenario
@@ -58,7 +58,7 @@ test('indices_overlap test 2/11', () => {
 });
 
 
-test('indices_overlap test 3/11', () => {
+test('indices_overlap test 3/10', () => {
   // read log output
   const consoleSpy = jest.spyOn(console, 'log');
   // scenario
@@ -74,7 +74,7 @@ test('indices_overlap test 3/11', () => {
 
 
 
-test('indices_overlap test 4/11', () => {
+test('indices_overlap test 4/10', () => {
   // read log output
   const consoleSpy = jest.spyOn(console, 'log');
   // scenario
@@ -90,34 +90,87 @@ test('indices_overlap test 4/11', () => {
 });
 
 
-/*
-test('indices_overlap test 5/11', () => {
+test('indices_overlap test 5/10', () => {
+  // scenario
+  const n_sets = 4;
+  const n_items = 2;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices).toEqual([[0, 1], [1, 2], [2, 3], [3, 0]]);
+  expect(n_examples).toBe(4);
 });
 
-
-
-test('indices_overlap test 6/11', () => {
+test('indices_overlap test 6/10', () => {
+  // scenario
+  const n_sets = 4;
+  const n_items = 3;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices).toEqual(
+    [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 0]]
+  );
+  expect(n_examples).toBe(8);
 });
 
-
-test('indices_overlap test 7/11', () => {
+test('indices_overlap test 7/10', () => {
+  // scenario
+  const n_sets = 4;
+  const n_items = 4;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices).toEqual(
+    [[0, 1, 2, 3], [3, 4, 5, 6], [6, 7, 8, 9], [9, 10, 11, 0]]
+  );
+  expect(n_examples).toBe(12);
 });
 
-
-
-test('indices_overlap test 8/11', () => {
+test('indices_overlap test 8/10', () => {
+  // scenario
+  const n_sets = 4;
+  const n_items = 5;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices).toEqual([
+      [0, 1, 2, 3, 4], [4, 5, 6, 7, 8],
+      [8, 9, 10, 11, 12], [12, 13, 14, 15, 0]
+  ]);
+  expect(n_examples).toBe(16);
 });
 
-
-
-test('indices_overlap test 9/11', () => {
+test('indices_overlap test 9/10', () => {
+  // scenario
+  const n_sets = 1000;
+  const n_items = 6;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // check
+  expect(bwsindices.length).toBe(1000);
+  expect(bwsindices[0].length).toBe(6);
+  expect(n_examples).toBe( n_sets * (n_items - 1) );
 });
 
-
-
-test('indices_overlap test 10/11', () => {
+test('indices_overlap test 10/10', () => {
+  // scenario
+  const n_sets = 100;
+  const n_items = 5;
+  const shuffle = false;
+  const [bwsindices, n_examples] = indices_overlap(n_sets, n_items, shuffle)
+  // prepare
+  var idx1 = []
+  bwsindices.forEach(list => {
+    idx1 = idx1.concat(list)
+  });
+  const idx2 = [...Array(n_examples).keys()];
+  // check
+  for(var i of idx1){
+    expect( idx2.includes(i) ).toBe(true);
+  }
+  for(var i of idx2){
+    expect( idx1.includes(i) ).toBe(true);
+  }
 });
 
-test('indices_overlap test 11/11', () => {
-});
-*/
