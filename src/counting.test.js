@@ -1,4 +1,4 @@
-const { direct_extract, merge_lil } = require('./counting');
+const { direct_extract, merge_lil, direct_extract_batch } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
 
@@ -52,5 +52,20 @@ test('direct_extract 3/3', () => {
 });
 
 
+test('direct_extract_batch 1/1', () => {
+  const evaluations = [
+    [[0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']],
+    [[0, 1, 0, 2], ['id4', 'id5', 'id6', 'id1']] 
+  ];
+  const [dok, detail] = direct_extract_batch(evaluations);
+  // check
+  expect(deepEqual(dok, {
+    "id1": {"id3": 1},
+    "id2": {"id3": 1},
+    "id4": {"id1": 2, "id2": 1, "id3": 1},
+    "id5": {"id1": 1, "id4": 1, "id6": 1},
+    "id6": {"id1": 1}
+  })).toBe(true);
+});
 
 

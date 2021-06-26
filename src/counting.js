@@ -196,7 +196,7 @@ const direct_extract = (stateids,
                         lil_nw=undefined) => {
   // check args
   if (stateids.length != combostates.length){
-    throw new Error(`stateids.length='${stateids.length}' and combostates.length=${combostates.length}are not equal.`);
+    throw new Error(`stateids.length='${stateids.length}' and combostates.length=${combostates.length} are not equal.`);
   }
   // set defaults
   if (lil === undefined){
@@ -244,78 +244,49 @@ const direct_extract = (stateids,
 };
 
 
-// def direct_extract_batch(
-//         evaluations: List[Tuple[List[ItemState], List[ItemID]]],
-//         dok: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         detail: Optional[dict] = None) -> (
-//             Dict[Tuple[ItemID, ItemID], int], dict):
-//     """Loop over an batch of BWS sets
+/** 
+ * Loop over an batch of BWS sets
+ * 
+ * @param {Array}   evaluations   A list of combinatorial states and associated identifiers.
+ * @param {JSON}    lil           Previously recorded frequencies for all directly extracted pairs.
+ * @param {JSON}    detail        Previously recorded frequencies for each type of pair: "BEST>WORST" 
+ *                                  (bw), "BEST>NOT" (bn), "NOT>WORST" (nw)
+ * @returns lil, detail
+ * 
+ * Example
+ *  const evaluations = [ [[0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']],
+ *                         [[0, 1, 0, 2], ['id4', 'id5', 'id6', 'id1']] ];
+ *  const [dok, detail] = direct_extract_batch(evaluations);
+ */
+const direct_extract_batch = (evaluations, 
+                              lil=undefined, 
+                              detail=undefined) => {
+  // initialize empty dict objects
+  if (lil === undefined){
+    lil = {}
+  }
+  if (detail === undefined){
+    detail = {"bw": {}, "bn": {}, "nw": {}}
+  }
+  // query `detail` object
+  var lil_bw = detail["bw"];
+  var lil_bn = detail["bn"];
+  var lil_nw = detail["nw"];
 
-//     Parameters:
-//     -----------
-//     evaluations : List[Tuple[List[ItemState], List[ItemID]]]
-//         A list of combinatorial states and associated identifiers.
+  // loop over all evaluated BWS sets, and post-process each
+  for (var [combostates, stateids] of evaluations){
+    lil, lil_bw, lil_bn, lil_nw = direct_extract(
+      stateids, combostates, lil, lil_bw, lil_bn, lil_nw);
+  }
 
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         (default: None) Previously recorded frequencies for all directly
-//           extracted pairs.
+  // copy details
+  detail["bw"] = lil_bw
+  detail["bn"] = lil_bn
+  detail["nw"] = lil_nw
 
-//     detail : dict
-//         (default: None) Previously recorded frequencies for each type of
-//           pair: "BEST>WORST" (bw), "BEST>NOT" (bn), "NOT>WORST" (nw)
-
-//     Returns:
-//     --------
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         The new/updated frequencies for directly extracted pairs.
-
-//     detail : dict
-//         The new/updated frequencies for  for the types of directly extracted
-//           pairs: "BEST>WORST" (bw), "BEST>NOT" (bn), "NOT>WORST" (nw)
-
-//     Example:
-//     -------
-//         import bwsample as bws
-//         evaluations = (
-//             ([0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']),
-//             ([0, 1, 0, 2], ['id4', 'id5', 'id6', 'id1']) )
-//         dok, detail = bws.counting.direct_extract_batch(evaluations)
-
-//         cnts, indicies = bws.to_scipy(dok)
-//         cnts.todense()
-
-//     Example 2:
-//     ----------
-//         evaluated_combostates = ([0, 0, 2, 1], [0, 1, 0, 2])
-//         mapped_sent_ids = (['id1', 'id2', 'id3', 'id4'],
-//                            ['id4', 'id5', 'id6', 'id1'])
-//         evaluations = zip(*(evaluated_combostates, mapped_sent_ids))
-//     """
-//     # initialize empty dict objects
-//     if dok is None:
-//         dok = {}
-//     if detail is None:
-//         detail = {}
-
-//     # query `detail` object
-//     dok_bw = detail.get("bw", {})
-//     dok_bn = detail.get("bn", {})
-//     dok_nw = detail.get("nw", {})
-
-//     # loop over all evaluated BWS sets, and post-process each
-//     for combostates, stateids in evaluations:
-//         dok, dok_bw, dok_bn, dok_nw = direct_extract(
-//             stateids, combostates, dok=dok,
-//             dok_bw=dok_bw, dok_bn=dok_bn, dok_nw=dok_nw)
-
-//     # copy details
-//     detail["bw"] = dok_bw
-//     detail["bn"] = dok_bn
-//     detail["nw"] = dok_nw
-
-//     # done
-//     return dok, detail
-
+  // done
+  return [lil, detail]
+}
 
 // def find_by_state(ids, states, s_):
 //     """Find indices of a certain state"""
@@ -637,5 +608,6 @@ module.exports = {
   incr_lil,
   add_lil, 
   merge_lil,
-  direct_extract
+  direct_extract,
+  direct_extract_batch
 };
