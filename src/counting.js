@@ -288,10 +288,24 @@ const direct_extract_batch = (evaluations,
   return [lil, detail]
 }
 
-// def find_by_state(ids, states, s_):
-//     """Find indices of a certain state"""
-//     return [i for i, s in zip(*(ids, states)) if s in s_]
 
+/**
+ * Find IDs by state
+ * 
+ * @param {Array} ids     IDs, e.g. UUID
+ * @param {Array} states  States, e.g. 0,1,2
+ * @param {Array} s_      List of states to search for
+ * @returns 
+ */
+const find_by_state = (ids, states, s_) => {
+  var out = [];
+  for(var i = 0; i < ids.length; i++){
+    if( s_.includes(states[i]) ){
+      out.push(ids[i]);
+    }
+  }
+  return out;
+}
 
 // def logical_rules(
 //         ids1: List[ItemID],
@@ -609,5 +623,6 @@ module.exports = {
   add_lil, 
   merge_lil,
   direct_extract,
-  direct_extract_batch
+  direct_extract_batch,
+  find_by_state
 };

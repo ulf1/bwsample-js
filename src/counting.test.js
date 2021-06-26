@@ -1,4 +1,4 @@
-const { direct_extract, merge_lil, direct_extract_batch } = require('./counting');
+const { direct_extract, merge_lil, direct_extract_batch, find_by_state } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
 
@@ -69,3 +69,9 @@ test('direct_extract_batch 1/1', () => {
 });
 
 
+test("find_by_state 1/1", () => {
+  const ids = ['a', 'b', 'c', 'd'];
+  const states = [0, 1, 0, 2];
+  const ids2 = find_by_state(ids, states, [0]);
+  expect(ids2).toEqual(['a', 'c']);
+});
