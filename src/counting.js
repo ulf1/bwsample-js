@@ -151,85 +151,43 @@ const merge_lil = (arr) => {
 
 
 
-// def direct_extract(
-//         stateids: List[ItemID],
-//         combostates: List[ItemState],
-//         dok: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None) -> (
-//             Dict[Tuple[ItemID, ItemID], int],
-//             Dict[Tuple[ItemID, ItemID], int],
-//             Dict[Tuple[ItemID, ItemID], int],
-//             Dict[Tuple[ItemID, ItemID], int]):
-//     """Extract ">" Pairs from one evaluated BWS set
-
-//     Parameters:
-//     -----------
-//     stateids: List[ItemID]
-//         A list of IDs (e.g. uuid) corresponding to the `combostates` list.
-
-//     combostates: List[ItemState]
-//         Combinatorial state variable. Each element of the list
-//           - corresponds to an ID in the `stateids` list,
-//           - represents an item state variable (or the i-th FSM), and
-//           - can habe one of the three states:
-//             - 0: NOT, unselected (initial state)
-//             - 1: BEST
-//             - 2: WORST
-//         (see TR-225)
-
-//     dok: Optional[Dict[Tuple[ItemID, ItemID], int]]
-//         Existing `dok` dictionary that is updated here. see below.
-
-//     dok_bw: Optional[Dict[Tuple[ItemID, ItemID], int]]
-//         Existing `dok_bw` dictionary that is updated here. see below.
-
-//     dok_bn: Optional[Dict[Tuple[ItemID, ItemID], int]]
-//         Existing `dok_bn` dictionary that is updated here. see below.
-
-//     dok_nw: Optional[Dict[Tuple[ItemID, ItemID], int]]
-//         Existing `dok_nw` dictionary that is updated here. see below.
-
-//     Returns:
-//     --------
-//     dok: Dict[Tuple[ItemID, ItemID], int]
-//         Dictionary with counts for each ">" pair, e.g. an
-//           entry `{..., ('B', 'C'): 1, ...} means `B>C` was counted `1` times.
-//         We can extract 3 types of pairs from 1 BWS set:
-//           - "BEST > WORST" (see dok_bw)
-//           - "BEST > NOT" (see dok_bn)
-//           - "NOT > WORST" (see dok_nw)
-//         The `dok` dictionary contains the aggregate counts of the types
-//           of pairs. Use `dok_bw`, `dok_bn` and `dok_nw` for
-//           attribution analysis.
-
-//     dok_bw: Dict[Tuple[ItemID, ItemID], int]
-//         Dictionary with counts for explicit "BEST > WORST" pairs.
-
-//     dok_bn: Dict[Tuple[ItemID, ItemID], int]
-//         Dictionary with counts for "BEST > NOT" pairs.
-
-//     dok_nw: Dict[Tuple[ItemID, ItemID], int]
-//         Dictionary with counts for "NOT > WORST" pairs.
-
-//     Examples:
-//     ---------
-//         import bwsample as bws
-
-//         # First BWS set
-//         stateids = ['A', 'B', 'C', 'D']
-//         combostates = [0, 0, 2, 1]  # BEST=1, WORST=2
-//         dok, dok_bw, dok_bn, dok_nw = bws.counting.direct_extract(
-//             stateids, combostates)
-
-//         # Update dictionary by processing the next BWS set
-//         stateids = ['D', 'E', 'F', 'A']
-//         combostates = [0, 1, 0, 2]
-//         dok, dok_bw, dok_bn, dok_nw = bws.counting.direct_extract(
-//             stateids, combostates, dok=dok,
-//             dok_bw=dok_bw, dok_bn=dok_bn, dok_nw=dok_nw)
-//     """
+/**
+ * Extract ">" Pairs from one evaluated BWS set
+ * 
+ * @param {Array[ID]}   stateids      A list of IDs (e.g. uuid) corresponding to the `combostates` list.
+ * @param {Array[Int]}  combostates   Combinatorial state variable. Each element of the list
+ *                                    - corresponds to an ID in the `stateids` list,
+ *                                    - represents an item state variable (or the i-th FSM), and
+ *                                    - can habe one of the three states:
+ *                                      - 0: NOT, unselected (initial state)
+ *                                      - 1: BEST
+ *                                      - 2: WORST
+ * @param {JSON}        lil           Dictionary with counts for each ">" pair, e.g. an
+ *                                      entry `{..., ('B', 'C'): 1, ...} means `B>C` was 
+ *                                      counted `1` times.
+ *                                    We can extract 3 types of pairs from 1 BWS set:
+ *                                      - "BEST > WORST" (see dok_bw)
+ *                                      - "BEST > NOT" (see dok_bn)
+ *                                      - "NOT > WORST" (see dok_nw)
+ *                                    The `dok` dictionary contains the aggregate counts of the 
+ *                                      types of pairs. Use `dok_bw`, `dok_bn` and `dok_nw` for
+ *                                      attribution analysis.
+ * @param {JSON}        lil_bw        Dictionary with counts for explicit "BEST > WORST" pairs.
+ * @param {JSON}        lil_bn        Dictionary with counts for "BEST > NOT" pairs.
+ * @param {JSON}        lil_nw        Dictionary with counts for "NOT > WORST" pairs.
+ * @returns lil, lil_bw, lil_bn, lil_nw
+ * 
+ * Example
+ *    // process the 1st evaluation
+ *    var stateids = ['A', 'B', 'C', 'D']
+ *    var combostates = [0, 0, 2, 1]  # BEST=1, WORST=2
+ *    var [lil, lil_bw, lil_bn, lil_nw] = direct_extract(stateids, combostates);
+ *    // update with the next evaluation
+ *    stateids = ['D', 'E', 'F', 'A']
+ *    combostates = [0, 1, 0, 2]
+ *    [lil, lil_bw, lil_bn, lil_nw] = direct_extract(
+ *      stateids, combostates, lil, lil_bw, lil_bn, lil_nw);
+ */
 const direct_extract = (stateids, 
                         combostates, 
                         lil=undefined, 
