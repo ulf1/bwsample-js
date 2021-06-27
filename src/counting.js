@@ -308,72 +308,34 @@ const find_by_state = (ids, states, s_) => {
 }
 
 
-// def logical_rules(
-//         ids1: List[ItemID],
-//         ids2: List[ItemID],
-//         states1: List[ItemState],
-//         states2: List[ItemState],
-//         s1: ItemState,
-//         s2: ItemState,
-//         dok: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nb: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_wn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_wb: Optional[Dict[Tuple[ItemID, ItemID], int]] = None):
-//     """Logical Inference rules
-
-//     Parameters:
-//     -----------
-//     ids1, ids2: List[ItemID] or List[str]
-//         List of IDs
-
-//     states1, states2: List[ItemState] or List[int]
-//         Combinatorial states, i.e. a list of item states. Each item state is
-//           encoded as
-//           - 0: NOT
-//           - 1: BEST
-//           - 2: WORST
-
-//     s1, s2 : ItemState or int
-//         The item state of the overlapping item
-
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         Previous counts/frequencies of logically inferred pairs.
-
-//     dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
-//         : Dict[Tuple[ItemID, ItemID], int]
-//         Previously counts/frequencies for different variants of
-//           logically inferred pairs counted separately
-
-//     Returns:
-//     --------
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         Aggregate counts
-
-//     dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
-//         : Dict[Tuple[ItemID, ItemID], int]
-//         The different variants of logically inferred pairs
-//           counted separately
-
-//     Example 1:
-//     ----------
-//         # find the overlapping item
-//         uid = list(set(ids1).intersection(ids2))[0]
-//         # lookup the item states
-//         try:
-//             p1, p2 = ids1.index(uid), ids2.index(uid)
-//             s1, s2 = states1[p1], states2[p2]
-//         ...
-
-//     Literature:
-//     -----------
-//     Hamster, U. A. (2021, March 9). Extracting Pairwise Comparisons Data
-//       from Best-Worst Scaling Surveys by Logical Inference.
-//       https://doi.org/10.31219/osf.io/qkxej
-//     """
+/**
+ * Logical Inference rules
+ * 
+ * @param {Array[ID]}   ids1    List of IDs
+ * @param {Array[ID]}   ids2    see "ids1"
+ * @param {Array[Int]}  states1 Combinatorial states, i.e. a list of item states. 
+ *                                Each item state is encoded as
+ *                                - 0: NOT
+ *                                - 1: BEST
+ *                                - 2: WORST
+ * @param {Array[Int]}  states2 see "states1"
+ * @param {Int}         s1      The item state of the overlapping item
+ * @param {Int}         s2      see "s1"
+ * @param {JSON}        agg     Previous counts/frequencies of logically inferred pairs.
+ * @param {JSON}        nn      Previously counts/frequencies for different variants of logically inferred pairs counted separately
+ * @param {JSON}        nb      see "nn"
+ * @param {JSON}        nw      see "nn"
+ * @param {JSON}        bn      see "nn"
+ * @param {JSON}        bw      see "nn"
+ * @param {JSON}        wn      see "nn"
+ * @param {JSON}        wb      see "nn"
+ * @returns agg, nn, nb, nw, bn, bw, wn, wb
+ * 
+ * Literature
+ *    Hamster, U. A. (2021, March 9). Extracting Pairwise Comparisons Data
+ *       from Best-Worst Scaling Surveys by Logical Inference.
+ *       https://doi.org/10.31219/osf.io/qkxej
+ */
 const logical_rules = (ids1, ids2, states1, states2, s1, s2, 
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
@@ -484,59 +446,19 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
 }
 
 
-// def logical_infer(
-//         ids1: List[ItemID],
-//         ids2: List[ItemID],
-//         states1: List[ItemState],
-//         states2: List[ItemState],
-//         dok: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nb: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_nw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_bw: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_wn: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
-//         dok_wb: Optional[Dict[Tuple[ItemID, ItemID], int]] = None):
-//     """Logical Inference between 2 BWS sets (See `logical_rules`)
-
-//     Parameters:
-//     -----------
-//     ids1, ids2: List[ItemID] or List[str]
-//         List of IDs
-
-//     states1, states2: List[ItemState] or List[int]
-//         Combinatorial states, i.e. a list of item states. Each item state is
-//           encoded as
-//           - 0: NOT
-//           - 1: BEST
-//           - 2: WORST
-
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         Previous counts/frequencies of logically inferred pairs.
-
-//     dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
-//         : Dict[Tuple[ItemID, ItemID], int]
-//         Previously counts/frequencies for different variants of
-//           logically inferred pairs counted separately
-
-//     Returns:
-//     --------
-//     dok : Dict[Tuple[ItemID, ItemID], int]
-//         Aggregate counts
-
-//     dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
-//         : Dict[Tuple[ItemID, ItemID], int]
-//         The different variants of logically inferred pairs
-//           counted separately
-
-//     Example:
-//     --------
-//         import bwsample as bws
-//         states1, ids1 = (1, 0, 2), ('D', 'E', 'F')
-//         states2, ids2 = (1, 0, 2), ('X', 'Y', 'D')
-//         dok, nn, nb, nw, bn, bw, wn, wb = bws.counting.logical_infer(
-//             ids1, ids2, states1, states2)
-//     """
+/**
+ * Logical Inference between 2 BWS sets (See `logical_rules`)
+ * 
+ * @param see logical_rules
+ * 
+ * Example
+ *    const ids1 = ['D', 'E', 'F'];
+ *    const ids2 = ['F', 'Y', 'Z'];
+ *    const states1 = [1, 0, 2];
+ *    const states2 = [1, 0, 2];
+ *    const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+ *     ids1, ids2, states1, states2)
+ */
 const logical_infer = (ids1, ids2, states1, states2,
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
