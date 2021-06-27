@@ -1,7 +1,7 @@
 const { 
-  direct_extract, merge_lil, direct_extract_batch, 
+  direct_extract, direct_extract_batch, 
   find_by_state, logical_infer, logical_infer_update,
-  count, add_lil
+  count, add_lil, merge_lil
 } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
@@ -440,10 +440,269 @@ test("logical_infer_update 1/12", () => {
   expect(deepEqual(logical_detail["bw"], {})).toBe(true);
   expect(deepEqual(logical_detail["wn"], {})).toBe(true);
   expect(deepEqual(logical_detail["wb"], {})).toBe(true);
-  expect(deepEqual(direct_lil, {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}} )).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil({'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}, target) )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
 });
 
+test("logical_infer_update 2/12", () => {
+  // nb: D>Y, D>Z
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['E', 'Y', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'D': {'Y': 1, 'Z': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], target)).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 3/12", () => {
+  // nw: X>F, Y>F
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'Y', 'E'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'X': {'F': 1}, 'Y': {'F': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], target)).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}} 
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 4/12", () => {
+  // bn: X>E, X>F
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'D', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'X': {'E': 1, 'F': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], target)).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 5/12", () => {
+  // bb: n.a.
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['D', 'Y', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  expect(deepEqual(logical_lil, {})).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, target2 )).toBe(true);
+});
+
+test("logical_infer_update 6/12", () => {
+  // bw: X>E, X>F, Y>E, Y>F
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'Y', 'D'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'X': {'E': 1, 'F': 1}, 'Y': {'E': 1, 'F': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], target)).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 7/12", () => {
+  // wn: D>Z, E>Z
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'F', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'D': {'Z': 1}, 'E': {'Z': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], target)).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 8/12", () => {
+  // wb: D>Y, D>Z, E>Y, E>Z
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['F', 'Y', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'D': {'Y': 1, 'Z': 1}, 'E': {'Y': 1, 'Z': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], target)).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+});
+
+test("logical_infer_update 9/12", () => {
+  // ww: n.a.
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'Y', 'F'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  expect(deepEqual(logical_lil, {})).toBe(true);
+  expect(deepEqual(logical_detail["nn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  const target2 = {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}
+  expect(deepEqual(direct_lil, target2)).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, target2 )).toBe(true);
+});
+
+test("logical_infer_update 10/12", () => {
+  const stateids = ['abc', 'def', 'ghi', 'jkl'];
+  const combostates = [0, 0, 2, 1]
+
+  const [_1, direct_lil, direct_detail, _2, _3] = count(
+        [[combostates, stateids]], undefined, undefined, false)
+
+  expect(deepEqual(direct_lil, {
+    'jkl': {'ghi': 1, 'abc': 1, 'def': 1}, 'abc': {'ghi': 1}, 'def': {'ghi': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'jkl': {'ghi': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'jkl': {'abc': 1, 'def': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'abc': {'ghi': 1}, 'def': {'ghi': 1}} )).toBe(true);
+  expect(deepEqual(
+    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    direct_lil)).toBe(true);
+});
+
+test("logical_infer_update 11/12", () => {
+  const stateids = ['abc', 'def', 'ghi', 'jkl'];
+  const combostates = [0, 0, 2, 1]
+
+  var direct_lil, direct_detail, _1, _2, _3, _4, _5, _6
+
+  var [_1, direct_lil, direct_detail, _2, _3] = count(
+        [[combostates, stateids]], undefined, undefined, false)
+
+  var [_4, direct_lil, direct_detail, _5, _6] = count(
+    [[combostates, stateids]], direct_lil, direct_detail, false)
+
+  //console.log(direct_lil, "\n", direct_detail)
+  //expect(deepEqual(direct_lil, {
+  //  'jkl': {'ghi': 2, 'abc': 2, 'def': 2}, 'abc': {'ghi': 2}, 'def': {'ghi': 2}} )).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'jkl': {'ghi': 2}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'jkl': {'abc': 2, 'def': 2}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'abc': {'ghi': 2}, 'def': {'ghi': 2}} )).toBe(true);
+  expect(deepEqual(
+    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    direct_lil)).toBe(true);
+});
+
+test("logical_infer_update 12/12", () => {
+  // scenario
+  var stateids = [];
+  var combostates = [];
+  for(var i = 0; i < 1000; i++){
+    stateids.push(uuid4());
+    combostates.push(0);
+  }
+  for(var i = 1; i <= 2; i++){
+    stateids.push(uuid4());
+    combostates.push(i);
+  }
+
+  var [_1, direct_lil, direct_detail, _2, _3] = count(
+    [[combostates, stateids]], undefined, undefined, false)
+
+  expect(deepEqual(
+    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    direct_lil)).toBe(true);
+});
