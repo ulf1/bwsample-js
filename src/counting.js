@@ -374,85 +374,114 @@ const find_by_state = (ids, states, s_) => {
 //       from Best-Worst Scaling Surveys by Logical Inference.
 //       https://doi.org/10.31219/osf.io/qkxej
 //     """
-const logical_rules = () => {
+const logical_rules = (ids1, ids2, states1, states2, s1, s2, 
+                       agg, nn, nb, nw, bn, bw, wn, wb) => {
+  // set defaults
+  if (agg === undefined){
+    agg = {}
+  }
+  if (nn === undefined){
+    nn = {}
+  }
+  if (nb === undefined){
+    nb = {}
+  }
+  if (nw === undefined){
+    nw = {}
+  }
+  if (bn === undefined){
+    bn = {}
+  }
+  if (bw === undefined){
+    bw = {}
+  }
+  if (wn === undefined){
+    wn = {}
+  }
+  if (wb === undefined){
+    wb = {}
+  }
 
+  // Logical Inferences rules
+  if (s1 === 0){  // 0:NOT
+    if (s2 === 0){  // 0:NOT
+      // nn: D>Z
+      for (var i of find_by_state(ids1, states1, [1]) ){
+        for (var j of find_by_state(ids2, states2, [2]) ){
+          agg = incr_lil(agg, i, j);
+          nn = incr_lil(nn, i, j);
+        }
+      }
+      // nn: X>F
+      for (var i of find_by_state(ids2, states2, [1]) ){
+        for (var j of find_by_state(ids1, states1, [2]) ){
+          agg = incr_lil(agg, i, j);
+          nn = incr_lil(nn, i, j);
+        }
+      }
+    }
+    else if (s2 === 1){  // 1:BEST
+      // nb: D>Y, D>Z
+      for (var i of find_by_state(ids1, states1, [1]) ){
+        for (var j of find_by_state(ids2, states2, [0, 2]) ){
+          agg = incr_lil(agg, i, j);
+          nb = incr_lil(nb, i, j);
+        }
+      }
+    }
+    else if (s2 === 2){  // 2:WORST
+      // nw: X>F, Y>F
+      for (var j of find_by_state(ids1, states1, [2]) ){
+        for (var i of find_by_state(ids2, states2, [0, 1]) ){
+          agg = incr_lil(agg, i, j);
+          nw = incr_lil(nw, i, j);
+        }
+      }
+    }
+  }
+  else if (s1 === 1){  // 1:BEST
+    if (s2 === 0){
+      // bn: X>E, X>F
+      for (var i of find_by_state(ids2, states2, [1]) ){
+        for (var j of find_by_state(ids1, states1, [0, 2]) ){
+          agg = incr_lil(agg, i, j);
+          bn = incr_lil(bn, i, j);
+        }
+      }
+    }
+    else if (s2 === 2){
+      // bw: X>E, X>F, Y>E, Y>F
+      for (var j of find_by_state(ids1, states1, [0, 2]) ){
+        for (var i of find_by_state(ids2, states2, [0, 1]) ){
+          agg = incr_lil(agg, i, j);
+          bw = incr_lil(bw, i, j);
+        }
+      }
+    }
+  }
+  else if (s1 === 2){  // 2:WORST
+    if (s2 === 0){
+      // wn: D>Z, E>Z
+      for (var i of find_by_state(ids1, states1, [0, 1]) ){
+        for (var j of find_by_state(ids2, states2, [2]) ){
+          agg = incr_lil(agg, i, j);
+          wn = incr_lil(wn, i, j);
+        }
+      }
+    }
+    else if (s2 === 1){
+      // wb: D>Y, D>Z, E>Y, E>Z
+      for (var i of find_by_state(ids1, states1, [0, 1]) ){
+        for (var j of find_by_state(ids2, states2, [0, 2]) ){
+          agg = incr_lil(agg, i, j);
+          wb = incr_lil(wb, i, j);
+        }
+      }
+    }
+  }
+  // done
+  return [agg, nn, nb, nw, bn, bw, wn, wb]
 }
-
-//     if dok is None:
-//         dok = {}
-//     if dok_nn is None:
-//         dok_nn = {}
-//     if dok_nb is None:
-//         dok_nb = {}
-//     if dok_nw is None:
-//         dok_nw = {}
-//     if dok_bn is None:
-//         dok_bn = {}
-//     if dok_bw is None:
-//         dok_bw = {}
-//     if dok_wn is None:
-//         dok_wn = {}
-//     if dok_wb is None:
-//         dok_wb = {}
-
-//     if s1 == 0:  # 0:NOT
-//         if s2 == 0:  # 0:NOT
-//             # nn: D>Z
-//             for i in find_by_state(ids1, states1, [1]):
-//                 for j in find_by_state(ids2, states2, [2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_nn[(i, j)] = 1 + dok_nn.get((i, j), 0)
-//             # nn: X>F
-//             for i in find_by_state(ids2, states2, [1]):
-//                 for j in find_by_state(ids1, states1, [2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_nn[(i, j)] = 1 + dok_nn.get((i, j), 0)
-
-//         elif s2 == 1:  # 1:BEST
-//             # nb: D>Y, D>Z
-//             for i in find_by_state(ids1, states1, [1]):
-//                 for j in find_by_state(ids2, states2, [0, 2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_nb[(i, j)] = 1 + dok_nb.get((i, j), 0)
-
-//         elif s2 == 2:  # 2:WORST
-//             # nw: X>F, Y>F
-//             for j in find_by_state(ids1, states1, [2]):
-//                 for i in find_by_state(ids2, states2, [0, 1]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_nw[(i, j)] = 1 + dok_nw.get((i, j), 0)
-
-//     elif s1 == 1:  # 1:BEST
-//         if s2 == 0:
-//             # bn: X>E, X>F
-//             for i in find_by_state(ids2, states2, [1]):
-//                 for j in find_by_state(ids1, states1, [0, 2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_bn[(i, j)] = 1 + dok_bn.get((i, j), 0)
-
-//         elif s2 == 2:
-//             # bw: X>E, X>F, Y>E, Y>F
-//             for j in find_by_state(ids1, states1, [0, 2]):
-//                 for i in find_by_state(ids2, states2, [0, 1]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_bw[(i, j)] = 1 + dok_bw.get((i, j), 0)
-
-//     elif s1 == 2:  # 2:WORST
-//         if s2 == 0:
-//             # wn: D>Z, E>Z
-//             for i in find_by_state(ids1, states1, [0, 1]):
-//                 for j in find_by_state(ids2, states2, [2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_wn[(i, j)] = 1 + dok_wn.get((i, j), 0)
-
-//         elif s2 == 1:
-//             # wb: D>Y, D>Z, E>Y, E>Z
-//             for i in find_by_state(ids1, states1, [0, 1]):
-//                 for j in find_by_state(ids2, states2, [0, 2]):
-//                     dok[(i, j)] = 1 + dok.get((i, j), 0)
-//                     dok_wb[(i, j)] = 1 + dok_wb.get((i, j), 0)
-//     # done
-//     return dok, dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
 
 
 // def logical_infer(
@@ -544,14 +573,14 @@ const logical_infer = (ids1, ids2, states1, states2,
       var p1 = ids1.indexOf(uid);
       var p2 = ids2.indexOf(uid);
       // lookup states of the ID
-      var s1 = states[p1];
-      var s2 = states[p2];
+      var s1 = states1[p1];
+      var s2 = states2[p2];
       // apply rules
       [agg, nn, nb, nw, bn, bw, wn, wb] = logical_rules(
         ids1, ids2, states1, states2, s1, s2, 
         agg, nn, nb, nw, bn, bw, wn, wb);
     } catch (err){
-      console.log(err.message);
+      console.log(`Error: ${err.message}`);
     }
   }
 
