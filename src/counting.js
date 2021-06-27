@@ -35,17 +35,17 @@
  * @param {*} b 
  * @returns 
  */
-const add_lil = (a, b) => {
-  var c = {...a};
+ const add_lil = (a, b) => {
+  var c = JSON.parse(JSON.stringify(a));
   for(var id1 in b){
     if(c[id1] === undefined){
-      c[id1] = b[id1];
+      c[id1] = JSON.parse(JSON.stringify(b[id1]));
     }else{
       for (var id2 in b[id1]){
         if(c[id1][id2] === undefined){
-          c[id1][id2] = b[id1][id2];
+          c[id1][id2] = parseInt(b[id1][id2]);
         }else{
-          c[id1][id2] += b[id1][id2];
+          c[id1][id2] += parseInt(b[id1][id2]);
         }
       }
     }
@@ -126,33 +126,32 @@ const merge_lil = (arr) => {
 //             evaluations)
 //     """
 const count = (evaluations,
-               direct_dok=undefined,
+               direct_lil=undefined,
                direct_detail=undefined,
                use_logical=true,
-               logical_dok=undefined,
+               logical_lil=undefined,
                logical_detail=undefined,
                logical_database=undefined) => {
+  // extract from each BWS set
+  [direct_lil, direct_detail] = direct_extract_batch(
+    evaluations, direct_lil, direct_detail);
 
+  // search for logical inferences
+  if (use_logical){
+    [logical_lil, logical_detail] = logical_infer_update(
+      evaluations, logical_database, logical_lil, logical_detail);
+  }
+  //  merge agg_lil=direct_dok+logical_dok
+  if (use_logical){
+    var agg_lil = add_lil(logical_lil, direct_lil);
+  }else{
+    var agg_lil = JSON.parse(JSON.stringify(direct_lil));
+  }
+
+  // done
+  return [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail]
 }
 
-//     # extract from each BWS set
-//     direct_dok, direct_detail = direct_extract_batch(
-//         evaluations, dok=direct_dok, detail=direct_detail)
-
-//     # search for logical inferences
-//     if use_logical:
-//         logical_dok, logical_detail = logical_infer_update(
-//             evaluations, database=logical_database,
-//             dok=logical_dok, detail=logical_detail)
-
-//     # merge agg_dok=direct_dok+logical_dok
-//     if use_logical:
-//         agg_dok = add_dok(logical_dok, direct_dok)
-//     else:
-//         agg_dok = direct_dok.copy()
-
-//     # done
-//     return agg_dok, direct_dok, direct_detail, logical_dok, logical_detail
 
 
 
@@ -208,13 +207,13 @@ const direct_extract = (stateids,
     agg = {};
   }
   if (bw === undefined){
-    agg = {};
+    bw = {};
   }
   if (bn === undefined){
-    agg = {};
+    bn = {};
   }
   if (nw === undefined){
-    agg = {};
+    nw = {};
   }
 
   // find `best` and `worst` py index
@@ -277,13 +276,11 @@ const direct_extract_batch = (evaluations,
   var bw = detail["bw"];
   var bn = detail["bn"];
   var nw = detail["nw"];
-
   // loop over all evaluated BWS sets, and post-process each
   for (var [combostates, stateids] of evaluations){
-    agg, bw, bn, nw = direct_extract(
+    [agg, bw, bn, nw] = direct_extract(
       stateids, combostates, agg, bw, bn, nw);
   }
-
   // copy details
   detail["bw"] = bw;
   detail["bn"] = bn;

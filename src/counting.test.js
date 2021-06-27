@@ -1,7 +1,7 @@
 const { 
   direct_extract, merge_lil, direct_extract_batch, 
   find_by_state, logical_infer, logical_infer_update,
-  count
+  count, add_lil
 } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
@@ -421,3 +421,29 @@ test("logical_infer_update 9/9", () => {
   expect(deepEqual(detail["wn"], {})).toBe(true);
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
+
+
+test("logical_infer_update 1/12", () => {
+  // nn: D>Z, X>F
+  const ids1 = ['D', 'E', 'F'];
+  const ids2 = ['X', 'E', 'Z'];
+  const states1 = [1, 0, 2];
+  const states2 = [1, 0, 2];
+  const [agg_lil, direct_lil, direct_detail, logical_lil, logical_detail] = count(
+    [[states1, ids1]], undefined, undefined, true, undefined, undefined, [[states2, ids2]])
+  const target = {'D': {'Z': 1}, 'X': {'F': 1}}
+  expect(deepEqual(logical_lil, target)).toBe(true);
+  expect(deepEqual(logical_detail["nn"], target)).toBe(true);
+  expect(deepEqual(logical_detail["nb"], {})).toBe(true);
+  expect(deepEqual(logical_detail["nw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["bw"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wn"], {})).toBe(true);
+  expect(deepEqual(logical_detail["wb"], {})).toBe(true);
+  expect(deepEqual(direct_lil, {'D': {'E': 1, 'F': 1}, 'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
+  expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
+  expect(deepEqual(agg_lil, add_lil({'D': {'E': 1, 'F': 1}, 'E': {'F': 1}}, target) )).toBe(true);
+});
+
