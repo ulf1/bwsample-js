@@ -162,7 +162,7 @@ const merge_lil = (arr) => {
  *                                      - 0: NOT, unselected (initial state)
  *                                      - 1: BEST
  *                                      - 2: WORST
- * @param {JSON}        lil           Dictionary with counts for each ">" pair, e.g. an
+ * @param {JSON}        agg           Dictionary with counts for each ">" pair, e.g. an
  *                                      entry `{..., ('B', 'C'): 1, ...} means `B>C` was 
  *                                      counted `1` times.
  *                                    We can extract 3 types of pairs from 1 BWS set:
@@ -172,44 +172,44 @@ const merge_lil = (arr) => {
  *                                    The `dok` dictionary contains the aggregate counts of the 
  *                                      types of pairs. Use `dok_bw`, `dok_bn` and `dok_nw` for
  *                                      attribution analysis.
- * @param {JSON}        lil_bw        Dictionary with counts for explicit "BEST > WORST" pairs.
- * @param {JSON}        lil_bn        Dictionary with counts for "BEST > NOT" pairs.
- * @param {JSON}        lil_nw        Dictionary with counts for "NOT > WORST" pairs.
- * @returns lil, lil_bw, lil_bn, lil_nw
+ * @param {JSON}        bw        Dictionary with counts for explicit "BEST > WORST" pairs.
+ * @param {JSON}        bn        Dictionary with counts for "BEST > NOT" pairs.
+ * @param {JSON}        nw        Dictionary with counts for "NOT > WORST" pairs.
+ * @returns agg, bw, bn, nw
  * 
  * Example
  *    // process the 1st evaluation
  *    var stateids = ['A', 'B', 'C', 'D']
  *    var combostates = [0, 0, 2, 1]  # BEST=1, WORST=2
- *    var [lil, lil_bw, lil_bn, lil_nw] = direct_extract(stateids, combostates);
+ *    var [agg, bw, bn, nw] = direct_extract(stateids, combostates);
  *    // update with the next evaluation
  *    stateids = ['D', 'E', 'F', 'A']
  *    combostates = [0, 1, 0, 2]
- *    [lil, lil_bw, lil_bn, lil_nw] = direct_extract(
- *      stateids, combostates, lil, lil_bw, lil_bn, lil_nw);
+ *    [agg, bw, bn, nw] = direct_extract(
+ *      stateids, combostates, agg, bw, bn, nw);
  */
 const direct_extract = (stateids, 
                         combostates, 
-                        lil=undefined, 
-                        lil_bw=undefined, 
-                        lil_bn=undefined, 
-                        lil_nw=undefined) => {
+                        agg=undefined, 
+                        bw=undefined, 
+                        bn=undefined, 
+                        nw=undefined) => {
   // check args
   if (stateids.length != combostates.length){
     throw new Error(`stateids.length='${stateids.length}' and combostates.length=${combostates.length} are not equal.`);
   }
   // set defaults
-  if (lil === undefined){
-    lil = {}
+  if (agg === undefined){
+    agg = {}
   }
-  if (lil_bw === undefined){
-    lil = {}
+  if (bw === undefined){
+    agg = {}
   }
-  if (lil_bn === undefined){
-    lil = {}
+  if (bn === undefined){
+    agg = {}
   }
-  if (lil_nw === undefined){
-    lil = {}
+  if (nw === undefined){
+    agg = {}
   }
 
   // find `best` and `worst` py index
@@ -219,28 +219,28 @@ const direct_extract = (stateids,
   const worst_idx = combostates.indexOf(2);
 
   if ( best_idx === -1 || worst_idx === -1){
-    return [lil, lil_bw, lil_bn, lil_nw];
+    return [agg, bw, bn, nw];
   }
 
   // add the direct "BEST > WORST" observation
   const best_uuid = stateids[best_idx];
   const worst_uuid = stateids[worst_idx];
-  lil = incr_lil(lil, best_uuid, worst_uuid);
-  lil_bw = incr_lil(lil_bw, best_uuid, worst_uuid);
+  agg = incr_lil(agg, best_uuid, worst_uuid);
+  bw = incr_lil(bw, best_uuid, worst_uuid);
 
   // loop over all other elements
   for ( var [middle_idx, middle_uuid] of stateids.entries() ){
     if (middle_idx != best_idx && middle_idx != worst_idx){
       // add `BEST > NOT`
-      lil = incr_lil(lil, best_uuid, middle_uuid);
-      lil_bn = incr_lil(lil_bn, best_uuid, middle_uuid);
+      agg = incr_lil(agg, best_uuid, middle_uuid);
+      bn = incr_lil(bn, best_uuid, middle_uuid);
       // add `NOT > WORST`
-      lil = incr_lil(lil, middle_uuid, worst_uuid);
-      lil_nw = incr_lil(lil_nw, middle_uuid, worst_uuid);
+      agg = incr_lil(agg, middle_uuid, worst_uuid);
+      nw = incr_lil(nw, middle_uuid, worst_uuid);
     }
   }
   // done
-  return [lil, lil_bw, lil_bn, lil_nw];
+  return [agg, bw, bn, nw];
 };
 
 
@@ -248,10 +248,10 @@ const direct_extract = (stateids,
  * Loop over an batch of BWS sets
  * 
  * @param {Array}   evaluations   A list of combinatorial states and associated identifiers.
- * @param {JSON}    lil           Previously recorded frequencies for all directly extracted pairs.
+ * @param {JSON}    agg           Previously recorded frequencies for all directly extracted pairs.
  * @param {JSON}    detail        Previously recorded frequencies for each type of pair: "BEST>WORST" 
  *                                  (bw), "BEST>NOT" (bn), "NOT>WORST" (nw)
- * @returns lil, detail
+ * @returns agg, detail
  * 
  * Example
  *  const evaluations = [ [[0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']],
@@ -259,33 +259,33 @@ const direct_extract = (stateids,
  *  const [dok, detail] = direct_extract_batch(evaluations);
  */
 const direct_extract_batch = (evaluations, 
-                              lil=undefined, 
+                              agg=undefined, 
                               detail=undefined) => {
   // initialize empty dict objects
-  if (lil === undefined){
-    lil = {}
+  if (agg === undefined){
+    agg = {}
   }
   if (detail === undefined){
     detail = {"bw": {}, "bn": {}, "nw": {}}
   }
   // query `detail` object
-  var lil_bw = detail["bw"];
-  var lil_bn = detail["bn"];
-  var lil_nw = detail["nw"];
+  var bw = detail["bw"];
+  var bn = detail["bn"];
+  var nw = detail["nw"];
 
   // loop over all evaluated BWS sets, and post-process each
   for (var [combostates, stateids] of evaluations){
-    lil, lil_bw, lil_bn, lil_nw = direct_extract(
-      stateids, combostates, lil, lil_bw, lil_bn, lil_nw);
+    agg, bw, bn, nw = direct_extract(
+      stateids, combostates, agg, bw, bn, nw);
   }
 
   // copy details
-  detail["bw"] = lil_bw
-  detail["bn"] = lil_bn
-  detail["nw"] = lil_nw
+  detail["bw"] = bw
+  detail["bn"] = bn
+  detail["nw"] = nw
 
   // done
-  return [lil, detail]
+  return [agg, detail]
 }
 
 
@@ -306,6 +306,7 @@ const find_by_state = (ids, states, s_) => {
   }
   return out;
 }
+
 
 // def logical_rules(
 //         ids1: List[ItemID],
@@ -373,6 +374,10 @@ const find_by_state = (ids, states, s_) => {
 //       from Best-Worst Scaling Surveys by Logical Inference.
 //       https://doi.org/10.31219/osf.io/qkxej
 //     """
+const logical_rules = () => {
+
+}
+
 //     if dok is None:
 //         dok = {}
 //     if dok_nn is None:
@@ -503,44 +508,56 @@ const find_by_state = (ids, states, s_) => {
 //         dok, nn, nb, nw, bn, bw, wn, wb = bws.counting.logical_infer(
 //             ids1, ids2, states1, states2)
 //     """
-//     if dok is None:
-//         dok = {}
-//     if dok_nn is None:
-//         dok_nn = {}
-//     if dok_nb is None:
-//         dok_nb = {}
-//     if dok_nw is None:
-//         dok_nw = {}
-//     if dok_bn is None:
-//         dok_bn = {}
-//     if dok_bw is None:
-//         dok_bw = {}
-//     if dok_wn is None:
-//         dok_wn = {}
-//     if dok_wb is None:
-//         dok_wb = {}
+const logical_infer = (ids1, ids2, states1, states2,
+                       agg, nn, nb, nw, bn, bw, wn, wb) => {
+  // set defaults
+  if (agg === undefined){
+    agg = {}
+  }
+  if (nn === undefined){
+    nn = {}
+  }
+  if (nb === undefined){
+    nb = {}
+  }
+  if (nw === undefined){
+    nw = {}
+  }
+  if (bn === undefined){
+    bn = {}
+  }
+  if (bw === undefined){
+    bw = {}
+  }
+  if (wn === undefined){
+    wn = {}
+  }
+  if (wb === undefined){
+    wb = {}
+  }
 
-//     # find common IDs, and loop over them
-//     for uid in set(ids1).intersection(ids2):
-//         try:
-//             # find positions of the ID
-//             p1, p2 = ids1.index(uid), ids2.index(uid)
-//             # lookup states of the ID
-//             s1, s2 = states1[p1], states2[p2]
-//             # apply rules
-//             (
-//                 dok, dok_nn, dok_nb, dok_nw,
-//                 dok_bn, dok_bw, dok_wn, dok_wb
-//             ) = logical_rules(
-//                 ids1, ids2, states1, states2, s1, s2,
-//                 dok=dok, dok_nn=dok_nn, dok_nb=dok_nb, dok_nw=dok_nw,
-//                 dok_bn=dok_bn, dok_bw=dok_bw, dok_wn=dok_wn, dok_wb=dok_wb)
-//         except ValueError as err:
-//             print(err)
-//             continue
+  // find common IDs, and loop over them
+  const commonids = ids1.filter(x => ids2.includes(x)); // intersection
+  for(var uid of commonids){
+    try{
+      // find positions of the ID
+      var p1 = ids1.indexOf(uid);
+      var p2 = ids2.indexOf(uid);
+      // lookup states of the ID
+      var s1 = states[p1];
+      var s2 = states[p2];
+      // apply rules
+      [agg, nn, nb, nw, bn, bw, wn, wb] = logical_rules(
+        ids1, ids2, states1, states2, s1, s2, 
+        agg, nn, nb, nw, bn, bw, wn, wb);
+    } catch (err){
+      console.log(err.message);
+    }
+  }
 
-//     # done
-//     return dok, dok_nn, dok_nb, dok_nw, dok_bn, dok_bw, dok_wn, dok_wb
+  // done
+  return [agg, nn, nb, nw, bn, bw, wn, wb]
+}
 
 
 // def logical_infer_update(
@@ -624,5 +641,6 @@ module.exports = {
   merge_lil,
   direct_extract,
   direct_extract_batch,
-  find_by_state
+  find_by_state,
+  logical_infer
 };
