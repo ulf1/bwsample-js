@@ -335,7 +335,7 @@ test('sample test 5/5', () => {
     })
   });
   cnt = Object.keys(cnt).map(key => cnt[key]);  // json values to array
-  console.log(cnt)
+  // console.log(cnt)
   // check
   for(var c of cnt){
     expect(c).toBe(2);
