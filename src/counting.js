@@ -1,8 +1,3 @@
-// from .utils import add_dok
-// from typing import List, Optional, Dict, Tuple
-// ItemState = int
-// ItemID = str
-
 /**
  * 
  * @param {*} lil 
@@ -130,6 +125,16 @@ const merge_lil = (arr) => {
 //         agg_dok, dir_dok, dir_detail, logi_dok, logi_detail = bws.count(
 //             evaluations)
 //     """
+const count = (evaluations,
+               direct_dok=undefined,
+               direct_detail=undefined,
+               use_logical=true,
+               logical_dok=undefined,
+               logical_detail=undefined,
+               logical_database=undefined) => {
+
+}
+
 //     # extract from each BWS set
 //     direct_dok, direct_detail = direct_extract_batch(
 //         evaluations, dok=direct_dok, detail=direct_detail)
@@ -200,16 +205,16 @@ const direct_extract = (stateids,
   }
   // set defaults
   if (agg === undefined){
-    agg = {}
+    agg = {};
   }
   if (bw === undefined){
-    agg = {}
+    agg = {};
   }
   if (bn === undefined){
-    agg = {}
+    agg = {};
   }
   if (nw === undefined){
-    agg = {}
+    agg = {};
   }
 
   // find `best` and `worst` py index
@@ -263,7 +268,7 @@ const direct_extract_batch = (evaluations,
                               detail=undefined) => {
   // initialize empty dict objects
   if (agg === undefined){
-    agg = {}
+    agg = {};
   }
   if (detail === undefined){
     detail = {"bw": {}, "bn": {}, "nw": {}}
@@ -280,12 +285,12 @@ const direct_extract_batch = (evaluations,
   }
 
   // copy details
-  detail["bw"] = bw
-  detail["bn"] = bn
-  detail["nw"] = nw
+  detail["bw"] = bw;
+  detail["bn"] = bn;
+  detail["nw"] = nw;
 
   // done
-  return [agg, detail]
+  return [agg, detail];
 }
 
 
@@ -340,28 +345,28 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
   if (agg === undefined){
-    agg = {}
+    agg = {};
   }
   if (nn === undefined){
-    nn = {}
+    nn = {};
   }
   if (nb === undefined){
-    nb = {}
+    nb = {};
   }
   if (nw === undefined){
-    nw = {}
+    nw = {};
   }
   if (bn === undefined){
-    bn = {}
+    bn = {};
   }
   if (bw === undefined){
-    bw = {}
+    bw = {};
   }
   if (wn === undefined){
-    wn = {}
+    wn = {};
   }
   if (wb === undefined){
-    wb = {}
+    wb = {};
   }
 
   // Logical Inferences rules
@@ -442,7 +447,7 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
     }
   }
   // done
-  return [agg, nn, nb, nw, bn, bw, wn, wb]
+  return [agg, nn, nb, nw, bn, bw, wn, wb];
 }
 
 
@@ -463,28 +468,28 @@ const logical_infer = (ids1, ids2, states1, states2,
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
   if (agg === undefined){
-    agg = {}
+    agg = {};
   }
   if (nn === undefined){
-    nn = {}
+    nn = {};
   }
   if (nb === undefined){
-    nb = {}
+    nb = {};
   }
   if (nw === undefined){
-    nw = {}
+    nw = {};
   }
   if (bn === undefined){
-    bn = {}
+    bn = {};
   }
   if (bw === undefined){
-    bw = {}
+    bw = {};
   }
   if (wn === undefined){
-    wn = {}
+    wn = {};
   }
   if (wb === undefined){
-    wb = {}
+    wb = {};
   }
 
   // find common IDs, and loop over them
@@ -507,7 +512,7 @@ const logical_infer = (ids1, ids2, states1, states2,
   }
 
   // done
-  return [agg, nn, nb, nw, bn, bw, wn, wb]
+  return [agg, nn, nb, nw, bn, bw, wn, wb];
 }
 
 
@@ -544,47 +549,53 @@ const logical_infer = (ids1, ids2, states1, states2,
 //         A dictionary that stores seperate DOKs for each variant of
 //           logically inferred pairs.
 //     """
-//     # Create DoKs
-//     if dok is None:
-//         dok = {}
-//     if detail is None:
-//         detail = {}
+const logical_infer_update = (evaluations,
+                              database=undefined,
+                              agg=undefined,
+                              detail=undefined) => {
+  // initialize empty dict objects
+  if (agg === undefined){
+    agg = {};
+  }
+  if (detail === undefined){
+    detail = {"nn": {}, "nb": {}, "nw": {}, "bn": {}, "bw": {}, "wn": {}, "wb": {}};
+  }
 
-//     # query `detail` object
-//     dok_nn = detail.get("nn", {})
-//     dok_nb = detail.get("nb", {})
-//     dok_nw = detail.get("nw", {})
-//     dok_bn = detail.get("bn", {})
-//     dok_bw = detail.get("bw", {})
-//     dok_wn = detail.get("wn", {})
-//     dok_wb = detail.get("wb", {})
+  // query `detail` object
+  var nn = detail["nn"];
+  var nb = detail["nb"];
+  var nw = detail["nw"];
+  var bn = detail["bn"];
+  var bw = detail["bw"];
+  var wn = detail["wn"];
+  var wb = detail["wb"];
 
-//     # Create new database
-//     if database is None:
-//         database = list(evaluations)
+  // Create new database
+  if (database === undefined){
+    database = evaluations;
+  }
 
-//     # start searching for logical inferences
-//     for states1, ids1 in evaluations:
-//         for states2, ids2 in database:
-//             (
-//                 dok, dok_nn, dok_nb, dok_nw,
-//                 dok_bn, dok_bw, dok_wn, dok_wb
-//             ) = logical_infer(
-//                 ids1, ids2, states1, states2,
-//                 dok=dok, dok_nn=dok_nn, dok_nb=dok_nb, dok_nw=dok_nw,
-//                 dok_bn=dok_bn, dok_bw=dok_bw, dok_wn=dok_wn, dok_wb=dok_wb)
+  // start searching for logical inferences
+  for (const [states1, ids1] of evaluations){
+    for (const [states2, ids2] of database){
+      [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+        ids1, ids2, states1, states2, agg, nn, nb, nw, bn, bw, wn, wb);
+    }
+  }
 
-//     # copy details
-//     detail["nn"] = dok_nn
-//     detail["nb"] = dok_nb
-//     detail["nw"] = dok_nw
-//     detail["bn"] = dok_bn
-//     detail["bw"] = dok_bw
-//     detail["wn"] = dok_wn
-//     detail["wb"] = dok_wb
+  // copy details
+  detail["nn"] = nn;
+  detail["nb"] = nb;
+  detail["nw"] = nw;
+  detail["bn"] = bn;
+  detail["bw"] = bw;
+  detail["wn"] = wn;
+  detail["wb"] = wb;
 
-//     # done
-//     return dok, detail
+  // done
+  return [agg, detail];
+}
+
 
 module.exports = {
   incr_lil,
@@ -593,5 +604,7 @@ module.exports = {
   direct_extract,
   direct_extract_batch,
   find_by_state,
-  logical_infer
+  logical_infer,
+  logical_infer_update,
+  count
 };
