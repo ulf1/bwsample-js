@@ -1,4 +1,4 @@
-const { rank, maximize_ratio } = require("./ranking");
+const { rank, maximize_ratio, maximize_hoaglinapprox } = require("./ranking");
 const { count } = require("./counting");
 
 
@@ -17,8 +17,8 @@ test("ranking.js unit tests", () => {
   const settings = [
     {"method": "ratio", "avg": "exist", "adjust": "minmax"},
     {"method": "ratio", "avg": "exist", "adjust": "quantile"},
-    //{"method": "approx", "avg": "exist", "adjust": "minmax"},
-    //{"method": "approx", "avg": "exist", "adjust": "quantile"}
+    {"method": "approx", "avg": "exist", "adjust": "minmax"},
+    {"method": "approx", "avg": "exist", "adjust": "quantile"}
   ];
 
   // loop over each setting
@@ -40,4 +40,13 @@ test("maximize_ratio", () => {
   expect(positions).toEqual([0, 2, 1])
   expect(sortedids).toEqual(["jkl", "def", "abc"])
   expect(metrics).toEqual([(1. + 2./3. + 0.4) / 3., 0.6, 1./3.])
+});
+
+
+test("maximize_hoaglinapprox", () => {
+  const cnt = {'jkl': {'ghi': 2, 'abc': 2, 'def': 2}, 'abc': {'jkl': 1}, 'def': {'jkl': 3}}
+  var [positions, sortedids, metrics, info] = maximize_hoaglinapprox(cnt);
+  expect(positions).toEqual([2, 0, 1])
+  expect(sortedids).toEqual(["def", "jkl", "abc"])
+  expect(metrics).toEqual([0.8386779155734472, 0.5922889408957621, 0])
 });
