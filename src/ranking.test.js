@@ -1,4 +1,4 @@
-const { rank } = require("./ranking");
+const { rank, maximize_ratio } = require("./ranking");
 const { count } = require("./counting");
 
 
@@ -15,14 +15,10 @@ test("ranking.js unit tests", () => {
 
   // possible settings
   const settings = [
-    {"method": "ratio", "avg": "all", "adjust": "minmax"},
     {"method": "ratio", "avg": "exist", "adjust": "minmax"},
-    {"method": "ratio", "avg": "all", "adjust": "quantile"},
     {"method": "ratio", "avg": "exist", "adjust": "quantile"},
-    {"method": "approx", "avg": "all", "adjust": "minmax"},
-    {"method": "approx", "avg": "exist", "adjust": "minmax"},
-    {"method": "approx", "avg": "all", "adjust": "quantile"},
-    {"method": "approx", "avg": "exist", "adjust": "quantile"}
+    //{"method": "approx", "avg": "exist", "adjust": "minmax"},
+    //{"method": "approx", "avg": "exist", "adjust": "quantile"}
   ];
 
   // loop over each setting
@@ -33,6 +29,15 @@ test("ranking.js unit tests", () => {
     expect(sortedids.length).toBe(4);
     expect(metrics.length).toBe(4);
     expect(scores.length).toBe(4);
-    expect(info instanceof JSON).toBe(true);
+    //expect(info instanceof JSON).toBe(true);
   }
 })
+
+
+test("maximize_ratio", () => {
+  const cnt = {'jkl': {'ghi': 2, 'abc': 2, 'def': 2}, 'abc': {'jkl': 1}, 'def': {'jkl': 3}}
+  var [positions, sortedids, metrics, info] = maximize_ratio(cnt);
+  expect(positions).toEqual([0, 2, 1])
+  expect(sortedids).toEqual(["jkl", "def", "abc"])
+  expect(metrics).toEqual([(1. + 2./3. + 0.4) / 3., 0.6, 1./3.])
+});
