@@ -1,7 +1,7 @@
 const { adjustscore } = require("./scaling");
 
 
-const rank = (cnt, method, adjust=undefined, avg) => {
+const rank = (cnt, method, adjust=undefined, avg="exist") => {
   // select method
   if (method == "ratio"){
     var [positions, sortedids, metrics, info] = maximize_ratio(cnt, avg); 
@@ -60,7 +60,11 @@ const maximize_ratio = (cnt, avg="exist") => {
       if (!ratio.hasOwnProperty(id1)){
         ratio[id1] = {}
       }
+      if (!ratio.hasOwnProperty(id2)){
+        ratio[id2] = {}
+      }
       ratio[id1][id2] = Nij / (Nij + Nji)
+      ratio[id2][id1] = Nji / (Nij + Nji)
     }
   }
 

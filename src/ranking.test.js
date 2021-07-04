@@ -37,9 +37,9 @@ test("ranking.js unit tests", () => {
 test("maximize_ratio", () => {
   const cnt = {'jkl': {'ghi': 2, 'abc': 2, 'def': 2}, 'abc': {'jkl': 1}, 'def': {'jkl': 3}}
   var [positions, sortedids, metrics, info] = maximize_ratio(cnt);
-  expect(positions).toEqual([0, 2, 1])
-  expect(sortedids).toEqual(["jkl", "def", "abc"])
-  expect(metrics).toEqual([(1. + 2./3. + 0.4) / 3., 0.6, 1./3.])
+  expect(positions).toEqual([0, 3, 2, 1])
+  expect(sortedids).toEqual(["jkl", "def", "abc", "ghi"])
+  expect(metrics).toEqual([(1. + 2./3. + 0.4) / 3., 0.6, 1./3., 0])
 });
 
 
