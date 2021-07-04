@@ -104,8 +104,19 @@ const maximize_ratio = (cnt, avg="exist") => {
  * @param {String}    avg   How to compute denominator for averaging (Default: "exist") 
  */
 const maximize_hoaglinapprox = (cnt, avg="exist") => {
+  // wrap p-value computation here
+  const hoaglin_pvalue = (Nij, Nji) => {
+    // compute Expected E
+    var E = (Nij + Nji) / 2.0;
+    // compute X^2
+    var Chi2 = Math.pow(Nij - E, 2) / E;
+    // compute Hoaglin's Approximation for DoF=0
+    var pval = Math.pow(0.1, (Math.sqrt(Chi2) + 1.37266) / 2.13161);
+    // ensure interval
+    return Math.max(0.0, Math.min(1.0, pval));
+  }
 
-  // compute Expected E
+  // compute Q=1-pvalue
   var qij = {}
   for( var id1 in cnt ){
     for( var id2 in cnt[id1] ){
@@ -116,21 +127,28 @@ const maximize_hoaglinapprox = (cnt, avg="exist") => {
           Nji = cnt[id2][id1];
         }
       }
-      // compute Expected E
-      var E = (Nij + Nji) / 2.0;
-      // compute X^2
-      var Chi2 = Math.pow(Nij - E, 2) / E;
-      // compute Hoaglin's Approximation for DoF=0
-      var pval = Math.pow(0.1, (Math.sqrt(Chi2) + 1.37266) / 2.13161);
-      // ensure interval
-      pval = Math.max(0.0, Math.min(1.0, pval));
-      // only if Nij>Nji
-      if ( Nij <= Nji ){pval = 1.0;}
-      
       if (!qij.hasOwnProperty(id1)){
         qij[id1] = {}
       }
-      qij[id1][id2] = 1.0 - pval;
+      if (!qij.hasOwnProperty(id2)){
+        qij[id2] = {}
+      }
+
+      // if `Nij > Nji` then set Qij=1-pval and Qji=0
+      // if `Nji > Nij` then set Qji=1-pval and Qij=0
+      // if `Nji = Nij` then set both Qij=Qji=0
+      if (Nij > Nji){
+        var pval = hoaglin_pvalue(Nij, Nji);
+        qij[id1][id2] = 1.0 - pval;
+        qij[id2][id1] = 0.0;
+      }else if (Nji > Nij){
+        var pval = hoaglin_pvalue(Nji, Nij);
+        qij[id2][id1] = 1.0 - pval;
+        qij[id1][id2] = 0.0;
+      }else {
+        qij[id1][id2] = 0.0;
+        qij[id2][id1] = 0.0;
+      }
     }
   }
 

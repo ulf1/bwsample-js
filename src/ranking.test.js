@@ -46,7 +46,7 @@ test("maximize_ratio", () => {
 test("maximize_hoaglinapprox", () => {
   const cnt = {'jkl': {'ghi': 2, 'abc': 2, 'def': 2}, 'abc': {'jkl': 1}, 'def': {'jkl': 3}}
   var [positions, sortedids, metrics, info] = maximize_hoaglinapprox(cnt);
-  expect(positions).toEqual([2, 0, 1])
-  expect(sortedids).toEqual(["def", "jkl", "abc"])
-  expect(metrics).toEqual([0.8386779155734472, 0.5922889408957621, 0])
+  expect(positions).toEqual([3, 0, 2, 1])
+  expect(sortedids).toEqual(["def", "jkl", "abc", "ghi"])
+  expect(metrics).toEqual([0.8386779155734472, 0.5922889408957621, 0, 0])
 });
