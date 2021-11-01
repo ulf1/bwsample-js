@@ -35,7 +35,7 @@
  * @param {*} b 
  * @returns 
  */
- const add_lil = (a, b) => {
+ const lilAdd = (a, b) => {
   var c = JSON.parse(JSON.stringify(a));
   for(var id1 in b){
     if(c[id1] === undefined){
@@ -62,7 +62,7 @@
 const merge_lil = (arr) => {
   var a = {};
   for (var b of arr){
-    a = add_lil(a, b);
+    a = lilAdd(a, b);
   }
   return a;
 }
@@ -143,7 +143,7 @@ const count = (evaluations,
   }
   //  merge agg_lil=direct_dok+logical_dok
   if (use_logical){
-    var agg_lil = add_lil(logical_lil, direct_lil);
+    var agg_lil = lilAdd(logical_lil, direct_lil);
   }else{
     var agg_lil = JSON.parse(JSON.stringify(direct_lil));
   }
@@ -596,7 +596,7 @@ const logical_infer_update = (evaluations,
 
 module.exports = {
   lilIncrement,
-  add_lil, 
+  lilAdd, 
   merge_lil,
   direct_extract,
   direct_extract_batch,
