@@ -59,7 +59,7 @@
  * @param {*} arr 
  * @returns 
  */
-const merge_lil = (arr) => {
+const lilMerge = (arr) => {
   var a = {};
   for (var b of arr){
     a = lilAdd(a, b);
@@ -597,7 +597,7 @@ const logical_infer_update = (evaluations,
 module.exports = {
   lilIncrement,
   lilAdd, 
-  merge_lil,
+  lilMerge,
   direct_extract,
   direct_extract_batch,
   find_by_state,
