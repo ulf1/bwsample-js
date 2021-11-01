@@ -1,7 +1,7 @@
 const { 
   direct_extract, direct_extract_batch, 
   find_by_state, logical_infer, logical_infer_update,
-  count, add_lil, merge_lil
+  count, lilAdd, lilMerge
 } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
@@ -18,7 +18,7 @@ test('direct_extract 1/3', () => {
   expect(deepEqual(bw, {'jkl': {'ghi': 1}} )).toBe(true);
   expect(deepEqual(bn, {'jkl': {'abc': 1, 'def': 1}} )).toBe(true);
   expect(deepEqual(nw, {'abc': {'ghi': 1}, 'def': {'ghi': 1}} )).toBe(true);
-  expect(deepEqual(agg, merge_lil([bw, bn, nw]) )).toBe(true);
+  expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
 test('direct_extract 2/3', () => {
@@ -35,7 +35,7 @@ test('direct_extract 2/3', () => {
   expect(deepEqual(bw, {'jkl': {'ghi': 2}} )).toBe(true);
   expect(deepEqual(bn, {'jkl': {'abc': 2, 'def': 2}} )).toBe(true);
   expect(deepEqual(nw, {'abc': {'ghi': 2}, 'def': {'ghi': 2}} )).toBe(true);
-  expect(deepEqual(agg, merge_lil([bw, bn, nw]) )).toBe(true);
+  expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
 test('direct_extract 3/3', () => {
@@ -52,7 +52,7 @@ test('direct_extract 3/3', () => {
   }
   const [agg, bw, bn, nw] = direct_extract(stateids, combostates);
   // check
-  expect(deepEqual(agg, merge_lil([bw, bn, nw]) )).toBe(true);
+  expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
 
@@ -445,7 +445,7 @@ test("logical_infer_update 1/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 2/12", () => {
@@ -470,7 +470,7 @@ test("logical_infer_update 2/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 3/12", () => {
@@ -495,7 +495,7 @@ test("logical_infer_update 3/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 4/12", () => {
@@ -520,7 +520,7 @@ test("logical_infer_update 4/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 5/12", () => {
@@ -569,7 +569,7 @@ test("logical_infer_update 6/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 7/12", () => {
@@ -594,7 +594,7 @@ test("logical_infer_update 7/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 8/12", () => {
@@ -619,7 +619,7 @@ test("logical_infer_update 8/12", () => {
   expect(deepEqual(direct_detail["bw"], {'D': {'F': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["bn"], {'D': {'E': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'E': {'F': 1}} )).toBe(true);
-  expect(deepEqual(agg_lil, add_lil(target2, target) )).toBe(true);
+  expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
 test("logical_infer_update 9/12", () => {
@@ -659,7 +659,7 @@ test("logical_infer_update 10/12", () => {
   expect(deepEqual(direct_detail["bn"], {'jkl': {'abc': 1, 'def': 1}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'abc': {'ghi': 1}, 'def': {'ghi': 1}} )).toBe(true);
   expect(deepEqual(
-    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    lilMerge([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
     direct_lil)).toBe(true);
 });
 
@@ -682,7 +682,7 @@ test("logical_infer_update 11/12", () => {
   expect(deepEqual(direct_detail["bn"], {'jkl': {'abc': 2, 'def': 2}} )).toBe(true);
   expect(deepEqual(direct_detail["nw"], {'abc': {'ghi': 2}, 'def': {'ghi': 2}} )).toBe(true);
   expect(deepEqual(
-    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    lilMerge([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
     direct_lil)).toBe(true);
 });
 
@@ -703,6 +703,6 @@ test("logical_infer_update 12/12", () => {
     [[combostates, stateids]], undefined, undefined, false)
 
   expect(deepEqual(
-    merge_lil([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
+    lilMerge([direct_detail["bw"], direct_detail["bn"], direct_detail["nw"]]), 
     direct_lil)).toBe(true);
 });

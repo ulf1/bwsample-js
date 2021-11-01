@@ -8,12 +8,12 @@
  * 
  * Example:
  *    var lil = undefined
- *    lil = incr_lil(lil, "la", "li");
- *    lil = incr_lil(lil, "la", "li");
- *    lil = incr_lil(lil, "la", "lu");
+ *    lil = lilIncrement(lil, "la", "li");
+ *    lil = lilIncrement(lil, "la", "li");
+ *    lil = lilIncrement(lil, "la", "lu");
  *    console.log(lil)
  */
- const incr_lil = (lil, id1, id2) => {
+ const lilIncrement = (lil, id1, id2) => {
   if (lil == undefined){
     lil = {};
   }
@@ -35,7 +35,7 @@
  * @param {*} b 
  * @returns 
  */
- const add_lil = (a, b) => {
+ const lilAdd = (a, b) => {
   var c = JSON.parse(JSON.stringify(a));
   for(var id1 in b){
     if(c[id1] === undefined){
@@ -53,16 +53,42 @@
   return c;
 }
 
+
+/** 
+ * Add count values of LIL object "b" to "a"
+ * 
+ * @param {*} a 
+ * @param {*} b 
+ * @returns 
+ */
+const lilAddInplace = (a, b) => {
+  for(var id1 in b){
+    if(a[id1] === undefined){
+      a[id1] = JSON.parse(JSON.stringify(b[id1]));
+    }else{
+      for (var id2 in b[id1]){
+        if(a[id1][id2] === undefined){
+          a[id1][id2] = parseInt(b[id1][id2]);
+        }else{
+          a[id1][id2] += parseInt(b[id1][id2]);
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+
 /**
  * Add count values of an list of LIL objects toegther
  * 
  * @param {*} arr 
  * @returns 
  */
-const merge_lil = (arr) => {
+const lilMerge = (arr) => {
   var a = {};
   for (var b of arr){
-    a = add_lil(a, b);
+    a = lilAdd(a, b);
   }
   return a;
 }
@@ -143,7 +169,7 @@ const count = (evaluations,
   }
   //  merge agg_lil=direct_dok+logical_dok
   if (use_logical){
-    var agg_lil = add_lil(logical_lil, direct_lil);
+    var agg_lil = lilAdd(logical_lil, direct_lil);
   }else{
     var agg_lil = JSON.parse(JSON.stringify(direct_lil));
   }
@@ -229,18 +255,18 @@ const direct_extract = (stateids,
   // add the direct "BEST > WORST" observation
   const best_uuid = stateids[best_idx];
   const worst_uuid = stateids[worst_idx];
-  agg = incr_lil(agg, best_uuid, worst_uuid);
-  bw = incr_lil(bw, best_uuid, worst_uuid);
+  agg = lilIncrement(agg, best_uuid, worst_uuid);
+  bw = lilIncrement(bw, best_uuid, worst_uuid);
 
   // loop over all other elements
   for ( var [middle_idx, middle_uuid] of stateids.entries() ){
     if (middle_idx != best_idx && middle_idx != worst_idx){
       // add `BEST > NOT`
-      agg = incr_lil(agg, best_uuid, middle_uuid);
-      bn = incr_lil(bn, best_uuid, middle_uuid);
+      agg = lilIncrement(agg, best_uuid, middle_uuid);
+      bn = lilIncrement(bn, best_uuid, middle_uuid);
       // add `NOT > WORST`
-      agg = incr_lil(agg, middle_uuid, worst_uuid);
-      nw = incr_lil(nw, middle_uuid, worst_uuid);
+      agg = lilIncrement(agg, middle_uuid, worst_uuid);
+      nw = lilIncrement(nw, middle_uuid, worst_uuid);
     }
   }
   // done
@@ -372,15 +398,15 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nn: D>Z
       for (var i of find_by_state(ids1, states1, [1]) ){
         for (var j of find_by_state(ids2, states2, [2]) ){
-          agg = incr_lil(agg, i, j);
-          nn = incr_lil(nn, i, j);
+          agg = lilIncrement(agg, i, j);
+          nn = lilIncrement(nn, i, j);
         }
       }
       // nn: X>F
       for (var i of find_by_state(ids2, states2, [1]) ){
         for (var j of find_by_state(ids1, states1, [2]) ){
-          agg = incr_lil(agg, i, j);
-          nn = incr_lil(nn, i, j);
+          agg = lilIncrement(agg, i, j);
+          nn = lilIncrement(nn, i, j);
         }
       }
     }
@@ -388,8 +414,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nb: D>Y, D>Z
       for (var i of find_by_state(ids1, states1, [1]) ){
         for (var j of find_by_state(ids2, states2, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          nb = incr_lil(nb, i, j);
+          agg = lilIncrement(agg, i, j);
+          nb = lilIncrement(nb, i, j);
         }
       }
     }
@@ -397,8 +423,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nw: X>F, Y>F
       for (var j of find_by_state(ids1, states1, [2]) ){
         for (var i of find_by_state(ids2, states2, [0, 1]) ){
-          agg = incr_lil(agg, i, j);
-          nw = incr_lil(nw, i, j);
+          agg = lilIncrement(agg, i, j);
+          nw = lilIncrement(nw, i, j);
         }
       }
     }
@@ -408,8 +434,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // bn: X>E, X>F
       for (var i of find_by_state(ids2, states2, [1]) ){
         for (var j of find_by_state(ids1, states1, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          bn = incr_lil(bn, i, j);
+          agg = lilIncrement(agg, i, j);
+          bn = lilIncrement(bn, i, j);
         }
       }
     }
@@ -417,8 +443,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // bw: X>E, X>F, Y>E, Y>F
       for (var j of find_by_state(ids1, states1, [0, 2]) ){
         for (var i of find_by_state(ids2, states2, [0, 1]) ){
-          agg = incr_lil(agg, i, j);
-          bw = incr_lil(bw, i, j);
+          agg = lilIncrement(agg, i, j);
+          bw = lilIncrement(bw, i, j);
         }
       }
     }
@@ -428,8 +454,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // wn: D>Z, E>Z
       for (var i of find_by_state(ids1, states1, [0, 1]) ){
         for (var j of find_by_state(ids2, states2, [2]) ){
-          agg = incr_lil(agg, i, j);
-          wn = incr_lil(wn, i, j);
+          agg = lilIncrement(agg, i, j);
+          wn = lilIncrement(wn, i, j);
         }
       }
     }
@@ -437,8 +463,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // wb: D>Y, D>Z, E>Y, E>Z
       for (var i of find_by_state(ids1, states1, [0, 1]) ){
         for (var j of find_by_state(ids2, states2, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          wb = incr_lil(wb, i, j);
+          agg = lilIncrement(agg, i, j);
+          wb = lilIncrement(wb, i, j);
         }
       }
     }
@@ -595,9 +621,10 @@ const logical_infer_update = (evaluations,
 
 
 module.exports = {
-  incr_lil,
-  add_lil, 
-  merge_lil,
+  lilIncrement,
+  lilAdd,
+  lilAddInplace,
+  lilMerge,
   direct_extract,
   direct_extract_batch,
   find_by_state,
