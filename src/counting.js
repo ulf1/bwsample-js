@@ -53,6 +53,32 @@
   return c;
 }
 
+
+/** 
+ * Add count values of LIL object "b" to "a"
+ * 
+ * @param {*} a 
+ * @param {*} b 
+ * @returns 
+ */
+const lilAddInplace = (a, b) => {
+  for(var id1 in b){
+    if(a[id1] === undefined){
+      a[id1] = JSON.parse(JSON.stringify(b[id1]));
+    }else{
+      for (var id2 in b[id1]){
+        if(a[id1][id2] === undefined){
+          a[id1][id2] = parseInt(b[id1][id2]);
+        }else{
+          a[id1][id2] += parseInt(b[id1][id2]);
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+
 /**
  * Add count values of an list of LIL objects toegther
  * 
@@ -596,7 +622,8 @@ const logical_infer_update = (evaluations,
 
 module.exports = {
   lilIncrement,
-  lilAdd, 
+  lilAdd,
+  lilAddInplace,
   lilMerge,
   direct_extract,
   direct_extract_batch,
