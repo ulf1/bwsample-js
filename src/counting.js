@@ -8,12 +8,12 @@
  * 
  * Example:
  *    var lil = undefined
- *    lil = incr_lil(lil, "la", "li");
- *    lil = incr_lil(lil, "la", "li");
- *    lil = incr_lil(lil, "la", "lu");
+ *    lil = lilIncrement(lil, "la", "li");
+ *    lil = lilIncrement(lil, "la", "li");
+ *    lil = lilIncrement(lil, "la", "lu");
  *    console.log(lil)
  */
- const incr_lil = (lil, id1, id2) => {
+ const lilIncrement = (lil, id1, id2) => {
   if (lil == undefined){
     lil = {};
   }
@@ -229,18 +229,18 @@ const direct_extract = (stateids,
   // add the direct "BEST > WORST" observation
   const best_uuid = stateids[best_idx];
   const worst_uuid = stateids[worst_idx];
-  agg = incr_lil(agg, best_uuid, worst_uuid);
-  bw = incr_lil(bw, best_uuid, worst_uuid);
+  agg = lilIncrement(agg, best_uuid, worst_uuid);
+  bw = lilIncrement(bw, best_uuid, worst_uuid);
 
   // loop over all other elements
   for ( var [middle_idx, middle_uuid] of stateids.entries() ){
     if (middle_idx != best_idx && middle_idx != worst_idx){
       // add `BEST > NOT`
-      agg = incr_lil(agg, best_uuid, middle_uuid);
-      bn = incr_lil(bn, best_uuid, middle_uuid);
+      agg = lilIncrement(agg, best_uuid, middle_uuid);
+      bn = lilIncrement(bn, best_uuid, middle_uuid);
       // add `NOT > WORST`
-      agg = incr_lil(agg, middle_uuid, worst_uuid);
-      nw = incr_lil(nw, middle_uuid, worst_uuid);
+      agg = lilIncrement(agg, middle_uuid, worst_uuid);
+      nw = lilIncrement(nw, middle_uuid, worst_uuid);
     }
   }
   // done
@@ -372,15 +372,15 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nn: D>Z
       for (var i of find_by_state(ids1, states1, [1]) ){
         for (var j of find_by_state(ids2, states2, [2]) ){
-          agg = incr_lil(agg, i, j);
-          nn = incr_lil(nn, i, j);
+          agg = lilIncrement(agg, i, j);
+          nn = lilIncrement(nn, i, j);
         }
       }
       // nn: X>F
       for (var i of find_by_state(ids2, states2, [1]) ){
         for (var j of find_by_state(ids1, states1, [2]) ){
-          agg = incr_lil(agg, i, j);
-          nn = incr_lil(nn, i, j);
+          agg = lilIncrement(agg, i, j);
+          nn = lilIncrement(nn, i, j);
         }
       }
     }
@@ -388,8 +388,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nb: D>Y, D>Z
       for (var i of find_by_state(ids1, states1, [1]) ){
         for (var j of find_by_state(ids2, states2, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          nb = incr_lil(nb, i, j);
+          agg = lilIncrement(agg, i, j);
+          nb = lilIncrement(nb, i, j);
         }
       }
     }
@@ -397,8 +397,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // nw: X>F, Y>F
       for (var j of find_by_state(ids1, states1, [2]) ){
         for (var i of find_by_state(ids2, states2, [0, 1]) ){
-          agg = incr_lil(agg, i, j);
-          nw = incr_lil(nw, i, j);
+          agg = lilIncrement(agg, i, j);
+          nw = lilIncrement(nw, i, j);
         }
       }
     }
@@ -408,8 +408,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // bn: X>E, X>F
       for (var i of find_by_state(ids2, states2, [1]) ){
         for (var j of find_by_state(ids1, states1, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          bn = incr_lil(bn, i, j);
+          agg = lilIncrement(agg, i, j);
+          bn = lilIncrement(bn, i, j);
         }
       }
     }
@@ -417,8 +417,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // bw: X>E, X>F, Y>E, Y>F
       for (var j of find_by_state(ids1, states1, [0, 2]) ){
         for (var i of find_by_state(ids2, states2, [0, 1]) ){
-          agg = incr_lil(agg, i, j);
-          bw = incr_lil(bw, i, j);
+          agg = lilIncrement(agg, i, j);
+          bw = lilIncrement(bw, i, j);
         }
       }
     }
@@ -428,8 +428,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // wn: D>Z, E>Z
       for (var i of find_by_state(ids1, states1, [0, 1]) ){
         for (var j of find_by_state(ids2, states2, [2]) ){
-          agg = incr_lil(agg, i, j);
-          wn = incr_lil(wn, i, j);
+          agg = lilIncrement(agg, i, j);
+          wn = lilIncrement(wn, i, j);
         }
       }
     }
@@ -437,8 +437,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
       // wb: D>Y, D>Z, E>Y, E>Z
       for (var i of find_by_state(ids1, states1, [0, 1]) ){
         for (var j of find_by_state(ids2, states2, [0, 2]) ){
-          agg = incr_lil(agg, i, j);
-          wb = incr_lil(wb, i, j);
+          agg = lilIncrement(agg, i, j);
+          wb = lilIncrement(wb, i, j);
         }
       }
     }
@@ -595,7 +595,7 @@ const logical_infer_update = (evaluations,
 
 
 module.exports = {
-  incr_lil,
+  lilIncrement,
   add_lil, 
   merge_lil,
   direct_extract,
