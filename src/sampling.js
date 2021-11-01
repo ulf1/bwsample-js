@@ -25,9 +25,9 @@ const sample = (examples,
     const n_sets = Math.trunc(examples.length / (n_items - 1))
     var bwsindices;
     if (method === 'overlap'){
-        bwsindices = indices_overlap(n_sets, n_items, shuffle)[0];
+        bwsindices = indicesOverlap(n_sets, n_items, shuffle)[0];
     }else if (method === 'twice'){
-        bwsindices = indices_twice(n_sets, n_items, shuffle)[0];
+        bwsindices = indicesTwice(n_sets, n_items, shuffle)[0];
     }else{
         throw new Error(`method='${method}' not available.`)
     }
@@ -72,9 +72,9 @@ const sample = (examples,
  *    var arrs = [[1, 2, 3], [4, 5, 6]]
  *    var n_sets = 2
  *    var n_items = 3
- *    var out = shuffle_subarrs(arrs, n_sets, n_items)
+ *    var out = shuffleSubarrs(arrs, n_sets, n_items)
  */
-const shuffle_subarrs = (arrs, n_sets=undefined, n_items=undefined) => {
+const shuffleSubarrs = (arrs, n_sets=undefined, n_items=undefined) => {
     if (n_sets === undefined){
         n_sets = arrs.length;
     }
@@ -130,9 +130,9 @@ const shuffle_subarrs = (arrs, n_sets=undefined, n_items=undefined) => {
  *                              `indices=range(0, n_examples)`
  * Examples:
  * ---------
- *    const {bwsindices, n_examples} = indices_overlap(1000, 4, false)
+ *    const {bwsindices, n_examples} = indicesOverlap(1000, 4, false)
  */
-const indices_overlap = (n_sets, 
+const indicesOverlap = (n_sets, 
                          n_items,
                          shuffle = true) => {
     // abort
@@ -169,7 +169,7 @@ const indices_overlap = (n_sets,
 
     // shuffle each BWS set
     if (shuffle){
-      bwsindices = shuffle_subarrs(bwsindices, n_sets, n_items);
+      bwsindices = shuffleSubarrs(bwsindices, n_sets, n_items);
     }
 
     // done
@@ -190,13 +190,13 @@ const indices_overlap = (n_sets,
  *                            `indices=range(0, n_examples)`
  * Examples:
  * ---------
- *    bwsindices, n_examples = indices_twice(1000, 4, False)
+ *    bwsindices, n_examples = indicesTwice(1000, 4, False)
  */
-const indices_twice = (n_sets, 
+const indicesTwice = (n_sets, 
                        n_items,
                        shuffle = true) => {
-    // (A) Call `indices_overlap` without randomness!
-    const [ bwsindices, n_examples ] = indices_overlap(n_sets, n_items, false);
+    // (A) Call `indicesOverlap` without randomness!
+    const [ bwsindices, n_examples ] = indicesOverlap(n_sets, n_items, false);
 
     if (n_items <= 2 && n_sets <= 1){
         return [ bwsindices, n_examples ]
@@ -232,7 +232,7 @@ const indices_twice = (n_sets,
 
     // (C) Shuffle here
     if (shuffle){
-      bwsindices = shuffle_subarrs(bwsindices, n_sets, n_items);
+      bwsindices = shuffleSubarrs(bwsindices, n_sets, n_items);
     }
 
     // done
@@ -242,7 +242,7 @@ const indices_twice = (n_sets,
 
 module.exports = {
   sample,
-  shuffle_subarrs,
-  indices_overlap,
-  indices_twice
+  shuffleSubarrs,
+  indicesOverlap,
+  indicesTwice
 };

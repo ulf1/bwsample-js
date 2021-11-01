@@ -1,19 +1,19 @@
-const { adjustscore } = require("./scaling");
+const { adjustScore } = require("./scaling");
 
 
 const rank = (cnt, method, adjust=undefined, avg="exist") => {
   // select method
   if (method == "ratio"){
-    var [positions, sortedids, metrics, info] = maximize_ratio(cnt, avg); 
+    var [positions, sortedids, metrics, info] = maximizeRatio(cnt, avg); 
   }else if (method == "approx" || method == "hoaglin"){
-    var [positions, sortedids, metrics, info] = maximize_hoaglinapprox(cnt, avg);
+    var [positions, sortedids, metrics, info] = maximizeHoaglinapprox(cnt, avg);
   }else{
     throw new Error(`method='${method}' not available.`);
   }
 
   // adjust scores
   if (adjust !== undefined){
-    var scores = adjustscore(metrics, adjust);
+    var scores = adjustScore(metrics, adjust);
   }else{
     var scores = [...metrics];
   }
@@ -44,7 +44,7 @@ const argsort = (arr) => {
  * @param {JSON LIL}  cnt   LIL-format sparse matrix of the pair counts
  * @param {String}    avg   How to compute denominator for averaging (Default: "exist") 
  */
-const maximize_ratio = (cnt, avg="exist") => {
+const maximizeRatio = (cnt, avg="exist") => {
   // compute ratios
   var ratio = {}
   for( var id1 in cnt ){
@@ -103,7 +103,7 @@ const maximize_ratio = (cnt, avg="exist") => {
  * @param {JSON LIL}  cnt   LIL-format sparse matrix of the pair counts
  * @param {String}    avg   How to compute denominator for averaging (Default: "exist") 
  */
-const maximize_hoaglinapprox = (cnt, avg="exist") => {
+const maximizeHoaglinapprox = (cnt, avg="exist") => {
   // wrap p-value computation here
   const hoaglin_pvalue = (Nij, Nji) => {
     // compute Expected E
@@ -182,6 +182,6 @@ const maximize_hoaglinapprox = (cnt, avg="exist") => {
 
 module.exports = {
   rank,
-  maximize_ratio,
-  maximize_hoaglinapprox
+  maximizeRatio,
+  maximizeHoaglinapprox
 }

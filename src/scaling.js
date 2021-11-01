@@ -4,11 +4,11 @@
  * @param {Array[float]}  scores   Vector with numbers
  * @param {String}        method    Name of the method
  */
-const adjustscore = (scores, method) => {
+const adjustScore = (scores, method) => {
   if (method === "quantile"){
-    return quantile_transform(scores, 10000);
-  }else if (method === "minmax"){
-    return minmax(scores);
+    return quantileTransform(scores, 10000);
+  }else if (method === "minMax"){
+    return minMax(scores);
   }else{
     throw new Error(`method='${method}' not available.`);
   }
@@ -19,7 +19,7 @@ const adjustscore = (scores, method) => {
  * 
  * @param {Array}   x   Vector with numbers
  */
-const minmax = (x) => {
+const minMax = (x) => {
   const xmin = Math.min(...x);
   const xmax = Math.max(...x);
   var y = [];
@@ -36,7 +36,7 @@ const minmax = (x) => {
  * @param {Array}   sample      Vector with numbers   
  * @param {Int}     n_quantiles Number of quantiles
  */
-const quantile_transform = (sample, n_quantiles) => {
+const quantileTransform = (sample, n_quantiles) => {
   // prepare
   const n_buckets = Math.min(sample.length, n_quantiles);
 
@@ -87,7 +87,7 @@ const quantile_transform = (sample, n_quantiles) => {
 
 
 module.exports = {
-  adjustscore,
-  minmax,
-  quantile_transform
+  adjustScore,
+  minMax,
+  quantileTransform
 }

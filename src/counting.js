@@ -159,12 +159,12 @@ const count = (evaluations,
                logical_detail=undefined,
                logical_database=undefined) => {
   // extract from each BWS set
-  [direct_lil, direct_detail] = direct_extract_batch(
+  [direct_lil, direct_detail] = directExtractBatch(
     evaluations, direct_lil, direct_detail);
 
   // search for logical inferences
   if (use_logical){
-    [logical_lil, logical_detail] = logical_infer_update(
+    [logical_lil, logical_detail] = logicalInferUpdate(
       evaluations, logical_database, logical_lil, logical_detail);
   }
   //  merge agg_lil=direct_dok+logical_dok
@@ -211,14 +211,14 @@ const count = (evaluations,
  *    // process the 1st evaluation
  *    var stateids = ['A', 'B', 'C', 'D']
  *    var combostates = [0, 0, 2, 1]  # BEST=1, WORST=2
- *    var [agg, bw, bn, nw] = direct_extract(stateids, combostates);
+ *    var [agg, bw, bn, nw] = directExtract(stateids, combostates);
  *    // update with the next evaluation
  *    stateids = ['D', 'E', 'F', 'A']
  *    combostates = [0, 1, 0, 2]
- *    [agg, bw, bn, nw] = direct_extract(
+ *    [agg, bw, bn, nw] = directExtract(
  *      stateids, combostates, agg, bw, bn, nw);
  */
-const direct_extract = (stateids, 
+const directExtract = (stateids, 
                         combostates, 
                         agg=undefined, 
                         bw=undefined, 
@@ -286,9 +286,9 @@ const direct_extract = (stateids,
  * Example
  *  const evaluations = [ [[0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']],
  *                         [[0, 1, 0, 2], ['id4', 'id5', 'id6', 'id1']] ];
- *  const [dok, detail] = direct_extract_batch(evaluations);
+ *  const [dok, detail] = directExtractBatch(evaluations);
  */
-const direct_extract_batch = (evaluations, 
+const directExtractBatch = (evaluations, 
                               agg=undefined, 
                               detail=undefined) => {
   // initialize empty dict objects
@@ -304,7 +304,7 @@ const direct_extract_batch = (evaluations,
   var nw = detail["nw"];
   // loop over all evaluated BWS sets, and post-process each
   for (var [combostates, stateids] of evaluations){
-    [agg, bw, bn, nw] = direct_extract(
+    [agg, bw, bn, nw] = directExtract(
       stateids, combostates, agg, bw, bn, nw);
   }
   // copy details
@@ -325,7 +325,7 @@ const direct_extract_batch = (evaluations,
  * @param {Array} s_      List of states to search for
  * @returns 
  */
-const find_by_state = (ids, states, s_) => {
+const findByState = (ids, states, s_) => {
   var out = [];
   for(var i = 0; i < ids.length; i++){
     if( s_.includes(states[i]) ){
@@ -364,7 +364,7 @@ const find_by_state = (ids, states, s_) => {
  *       from Best-Worst Scaling Surveys by Logical Inference.
  *       https://doi.org/10.31219/osf.io/qkxej
  */
-const logical_rules = (ids1, ids2, states1, states2, s1, s2, 
+const logicalRules = (ids1, ids2, states1, states2, s1, s2, 
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
   if (agg === undefined){
@@ -396,15 +396,15 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
   if (s1 === 0){  // 0:NOT
     if (s2 === 0){  // 0:NOT
       // nn: D>Z
-      for (var i of find_by_state(ids1, states1, [1]) ){
-        for (var j of find_by_state(ids2, states2, [2]) ){
+      for (var i of findByState(ids1, states1, [1]) ){
+        for (var j of findByState(ids2, states2, [2]) ){
           agg = lilIncrement(agg, i, j);
           nn = lilIncrement(nn, i, j);
         }
       }
       // nn: X>F
-      for (var i of find_by_state(ids2, states2, [1]) ){
-        for (var j of find_by_state(ids1, states1, [2]) ){
+      for (var i of findByState(ids2, states2, [1]) ){
+        for (var j of findByState(ids1, states1, [2]) ){
           agg = lilIncrement(agg, i, j);
           nn = lilIncrement(nn, i, j);
         }
@@ -412,8 +412,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
     }
     else if (s2 === 1){  // 1:BEST
       // nb: D>Y, D>Z
-      for (var i of find_by_state(ids1, states1, [1]) ){
-        for (var j of find_by_state(ids2, states2, [0, 2]) ){
+      for (var i of findByState(ids1, states1, [1]) ){
+        for (var j of findByState(ids2, states2, [0, 2]) ){
           agg = lilIncrement(agg, i, j);
           nb = lilIncrement(nb, i, j);
         }
@@ -421,8 +421,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
     }
     else if (s2 === 2){  // 2:WORST
       // nw: X>F, Y>F
-      for (var j of find_by_state(ids1, states1, [2]) ){
-        for (var i of find_by_state(ids2, states2, [0, 1]) ){
+      for (var j of findByState(ids1, states1, [2]) ){
+        for (var i of findByState(ids2, states2, [0, 1]) ){
           agg = lilIncrement(agg, i, j);
           nw = lilIncrement(nw, i, j);
         }
@@ -432,8 +432,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
   else if (s1 === 1){  // 1:BEST
     if (s2 === 0){
       // bn: X>E, X>F
-      for (var i of find_by_state(ids2, states2, [1]) ){
-        for (var j of find_by_state(ids1, states1, [0, 2]) ){
+      for (var i of findByState(ids2, states2, [1]) ){
+        for (var j of findByState(ids1, states1, [0, 2]) ){
           agg = lilIncrement(agg, i, j);
           bn = lilIncrement(bn, i, j);
         }
@@ -441,8 +441,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
     }
     else if (s2 === 2){
       // bw: X>E, X>F, Y>E, Y>F
-      for (var j of find_by_state(ids1, states1, [0, 2]) ){
-        for (var i of find_by_state(ids2, states2, [0, 1]) ){
+      for (var j of findByState(ids1, states1, [0, 2]) ){
+        for (var i of findByState(ids2, states2, [0, 1]) ){
           agg = lilIncrement(agg, i, j);
           bw = lilIncrement(bw, i, j);
         }
@@ -452,8 +452,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
   else if (s1 === 2){  // 2:WORST
     if (s2 === 0){
       // wn: D>Z, E>Z
-      for (var i of find_by_state(ids1, states1, [0, 1]) ){
-        for (var j of find_by_state(ids2, states2, [2]) ){
+      for (var i of findByState(ids1, states1, [0, 1]) ){
+        for (var j of findByState(ids2, states2, [2]) ){
           agg = lilIncrement(agg, i, j);
           wn = lilIncrement(wn, i, j);
         }
@@ -461,8 +461,8 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
     }
     else if (s2 === 1){
       // wb: D>Y, D>Z, E>Y, E>Z
-      for (var i of find_by_state(ids1, states1, [0, 1]) ){
-        for (var j of find_by_state(ids2, states2, [0, 2]) ){
+      for (var i of findByState(ids1, states1, [0, 1]) ){
+        for (var j of findByState(ids2, states2, [0, 2]) ){
           agg = lilIncrement(agg, i, j);
           wb = lilIncrement(wb, i, j);
         }
@@ -475,19 +475,19 @@ const logical_rules = (ids1, ids2, states1, states2, s1, s2,
 
 
 /**
- * Logical Inference between 2 BWS sets (See `logical_rules`)
+ * Logical Inference between 2 BWS sets (See `logicalRules`)
  * 
- * @param see logical_rules
+ * @param see logicalRules
  * 
  * Example
  *    const ids1 = ['D', 'E', 'F'];
  *    const ids2 = ['F', 'Y', 'Z'];
  *    const states1 = [1, 0, 2];
  *    const states2 = [1, 0, 2];
- *    const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+ *    const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
  *     ids1, ids2, states1, states2)
  */
-const logical_infer = (ids1, ids2, states1, states2,
+const logicalInfer = (ids1, ids2, states1, states2,
                        agg, nn, nb, nw, bn, bw, wn, wb) => {
   // set defaults
   if (agg === undefined){
@@ -526,7 +526,7 @@ const logical_infer = (ids1, ids2, states1, states2,
       var s1 = states1[p1];
       var s2 = states2[p2];
       // apply rules
-      [agg, nn, nb, nw, bn, bw, wn, wb] = logical_rules(
+      [agg, nn, nb, nw, bn, bw, wn, wb] = logicalRules(
         ids1, ids2, states1, states2, s1, s2, 
         agg, nn, nb, nw, bn, bw, wn, wb);
     } catch (err){
@@ -539,7 +539,7 @@ const logical_infer = (ids1, ids2, states1, states2,
 }
 
 
-// def logical_infer_update(
+// def logicalInferUpdate(
 //         evaluations: List[Tuple[List[ItemState], List[ItemID]]],
 //         database: List[Tuple[List[ItemState], List[ItemID]]] = None,
 //         dok: Optional[Dict[Tuple[ItemID, ItemID], int]] = None,
@@ -572,7 +572,7 @@ const logical_infer = (ids1, ids2, states1, states2,
 //         A dictionary that stores seperate DOKs for each variant of
 //           logically inferred pairs.
 //     """
-const logical_infer_update = (evaluations,
+const logicalInferUpdate = (evaluations,
                               database=undefined,
                               agg=undefined,
                               detail=undefined) => {
@@ -601,7 +601,7 @@ const logical_infer_update = (evaluations,
   // start searching for logical inferences
   for (const [states1, ids1] of evaluations){
     for (const [states2, ids2] of database){
-      [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+      [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
         ids1, ids2, states1, states2, agg, nn, nb, nw, bn, bw, wn, wb);
     }
   }
@@ -625,10 +625,10 @@ module.exports = {
   lilAdd,
   lilAddInplace,
   lilMerge,
-  direct_extract,
-  direct_extract_batch,
-  find_by_state,
-  logical_infer,
-  logical_infer_update,
+  directExtract,
+  directExtractBatch,
+  findByState,
+  logicalInfer,
+  logicalInferUpdate,
   count
 };
