@@ -1,16 +1,16 @@
 const { 
-  direct_extract, direct_extract_batch, 
-  find_by_state, logical_infer, logical_infer_update,
+  directExtract, directExtractBatch, 
+  findByState, logicalInfer, logicalInferUpdate,
   count, lilAdd, lilMerge
 } = require('./counting');
 const { v4: uuid4 } = require('uuid');
 const deepEqual = require('deep-equal')
 
-test('direct_extract 1/3', () => {
+test('directExtract 1/3', () => {
   // scenario
   const stateids = ['abc', 'def', 'ghi', 'jkl'];
   const combostates = [0, 0, 2, 1];
-  const [agg, bw, bn, nw] = direct_extract(stateids, combostates);
+  const [agg, bw, bn, nw] = directExtract(stateids, combostates);
   // check
   expect(deepEqual(agg, {
     'abc': {'ghi': 1}, 'def': {'ghi': 1}, 
@@ -21,12 +21,12 @@ test('direct_extract 1/3', () => {
   expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
-test('direct_extract 2/3', () => {
+test('directExtract 2/3', () => {
   // scenario
   const stateids = ['abc', 'def', 'ghi', 'jkl'];
   const combostates = [0, 0, 2, 1];
-  var [agg, bw, bn, nw] = direct_extract(stateids, combostates);
-  [agg, bw, bn, nw] = direct_extract(
+  var [agg, bw, bn, nw] = directExtract(stateids, combostates);
+  [agg, bw, bn, nw] = directExtract(
     stateids, combostates, agg, bw, bn, nw);
   // check
   expect(deepEqual(agg, {
@@ -38,7 +38,7 @@ test('direct_extract 2/3', () => {
   expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
-test('direct_extract 3/3', () => {
+test('directExtract 3/3', () => {
   // scenario
   var stateids = [];
   var combostates = [];
@@ -50,18 +50,18 @@ test('direct_extract 3/3', () => {
     stateids.push(uuid4());
     combostates.push(i);
   }
-  const [agg, bw, bn, nw] = direct_extract(stateids, combostates);
+  const [agg, bw, bn, nw] = directExtract(stateids, combostates);
   // check
   expect(deepEqual(agg, lilMerge([bw, bn, nw]) )).toBe(true);
 });
 
 
-test('direct_extract_batch 1/1', () => {
+test('directExtractBatch 1/1', () => {
   const evaluations = [
     [[0, 0, 2, 1], ['id1', 'id2', 'id3', 'id4']],
     [[0, 1, 0, 2], ['id4', 'id5', 'id6', 'id1']] 
   ];
-  const [dok, detail] = direct_extract_batch(evaluations);
+  const [dok, detail] = directExtractBatch(evaluations);
   // check
   expect(deepEqual(dok, {
     "id1": {"id3": 1},
@@ -73,21 +73,21 @@ test('direct_extract_batch 1/1', () => {
 });
 
 
-test("find_by_state 1/1", () => {
+test("findByState 1/1", () => {
   const ids = ['a', 'b', 'c', 'd'];
   const states = [0, 1, 0, 2];
-  const ids2 = find_by_state(ids, states, [0]);
+  const ids2 = findByState(ids, states, [0]);
   expect(ids2).toEqual(['a', 'c']);
 });
 
 
-test("logical_infer 1/9", () => {
+test("logicalInfer 1/9", () => {
   // nn: D>Z, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'E', 'Z'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'D': {'Z': 1}, 'X': {'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -100,13 +100,13 @@ test("logical_infer 1/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 2/9", () => {
+test("logicalInfer 2/9", () => {
   // nb: D>Y, D>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['E', 'Y', 'Z'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'D': {'Y': 1, 'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -119,13 +119,13 @@ test("logical_infer 2/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 3/9", () => {
+test("logicalInfer 3/9", () => {
   // nw: X>F, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'E'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'X': {'F': 1}, 'Y': {'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -138,13 +138,13 @@ test("logical_infer 3/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 4/9", () => {
+test("logicalInfer 4/9", () => {
   // bn: X>E, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'D', 'Z'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'X': {'E': 1, 'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -157,13 +157,13 @@ test("logical_infer 4/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 5/9", () => {
+test("logicalInfer 5/9", () => {
   // bb: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['D', 'Y', 'Z'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   expect(deepEqual(agg, {})).toBe(true);
   expect(deepEqual(nn, {})).toBe(true);
@@ -175,13 +175,13 @@ test("logical_infer 5/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 6/9", () => {
+test("logicalInfer 6/9", () => {
   // bw: X>E, X>F, Y>E, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'D'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'X': {'E': 1, 'F': 1}, 'Y': {'E': 1, 'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -194,13 +194,13 @@ test("logical_infer 6/9", () => {
   expect(deepEqual(wb, {})).toBe(true);
 });
 
-test("logical_infer 7/9", () => {
+test("logicalInfer 7/9", () => {
   // wn: D>Z, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'F', 'Z'];
   const states1 = [1, 0, 2];  
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'D': {'Z': 1}, 'E': {'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -214,13 +214,13 @@ test("logical_infer 7/9", () => {
 });
 
 
-test("logical_infer 8/9", () => {
+test("logicalInfer 8/9", () => {
   // wb: D>Y, D>Z, E>Y, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['F', 'Y', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   const target = {'D': {'Y': 1, 'Z': 1}, 'E': {'Y': 1, 'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -233,13 +233,13 @@ test("logical_infer 8/9", () => {
   expect(deepEqual(wb, target)).toBe(true);
 });
 
-test("logical_infer 9/9", () => {
+test("logicalInfer 9/9", () => {
   // ww: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'F'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, nn, nb, nw, bn, bw, wn, wb] = logical_infer(
+  const [agg, nn, nb, nw, bn, bw, wn, wb] = logicalInfer(
     ids1, ids2, states1, states2)
   expect(deepEqual(agg, {})).toBe(true);
   expect(deepEqual(nn, {})).toBe(true);
@@ -253,13 +253,13 @@ test("logical_infer 9/9", () => {
 
 
 
-test("logical_infer_update 1/9", () => {
+test("logicalInferUpdate 1/9", () => {
   // nn: D>Z, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'E', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'D': {'Z': 1}, 'X': {'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -272,13 +272,13 @@ test("logical_infer_update 1/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 2/9", () => {
+test("logicalInferUpdate 2/9", () => {
   // nb: D>Y, D>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['E', 'Y', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'D': {'Y': 1, 'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -291,13 +291,13 @@ test("logical_infer_update 2/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 3/9", () => {
+test("logicalInferUpdate 3/9", () => {
   // nw: X>F, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'E'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
         [[states1, ids1]], [[states2, ids2]])
   const target = {'X': {'F': 1}, 'Y': {'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -310,13 +310,13 @@ test("logical_infer_update 3/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 4/9", () => {
+test("logicalInferUpdate 4/9", () => {
   // bn: X>E, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'D', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'X': {'E': 1, 'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -329,13 +329,13 @@ test("logical_infer_update 4/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 5/9", () => {
+test("logicalInferUpdate 5/9", () => {
   // bb: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['D', 'Y', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   expect(deepEqual(agg, {})).toBe(true);
   expect(deepEqual(detail["nn"], {})).toBe(true);
@@ -347,13 +347,13 @@ test("logical_infer_update 5/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 6/9", () => {
+test("logicalInferUpdate 6/9", () => {
   // bw: X>E, X>F, Y>E, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'D'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'X': {'E': 1, 'F': 1}, 'Y': {'E': 1, 'F': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -366,13 +366,13 @@ test("logical_infer_update 6/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 7/9", () => {
+test("logicalInferUpdate 7/9", () => {
   // wn: D>Z, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'F', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'D': {'Z': 1}, 'E': {'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -385,13 +385,13 @@ test("logical_infer_update 7/9", () => {
   expect(deepEqual(detail["wb"], {})).toBe(true);
 });
 
-test("logical_infer_update 8/9", () => {
+test("logicalInferUpdate 8/9", () => {
   // wb: D>Y, D>Z, E>Y, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['F', 'Y', 'Z'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   const target = {'D': {'Y': 1, 'Z': 1}, 'E': {'Y': 1, 'Z': 1}}
   expect(deepEqual(agg, target)).toBe(true);
@@ -404,13 +404,13 @@ test("logical_infer_update 8/9", () => {
   expect(deepEqual(detail["wb"], target)).toBe(true);
 });
 
-test("logical_infer_update 9/9", () => {
+test("logicalInferUpdate 9/9", () => {
   // ww: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'F'];
   const states1 = [1, 0, 2];
   const states2 = [1, 0, 2];
-  const [agg, detail] = logical_infer_update(
+  const [agg, detail] = logicalInferUpdate(
     [[states1, ids1]], [[states2, ids2]])
   expect(deepEqual(agg, {})).toBe(true);
   expect(deepEqual(detail["nn"], {})).toBe(true);
@@ -423,7 +423,7 @@ test("logical_infer_update 9/9", () => {
 });
 
 
-test("logical_infer_update 1/12", () => {
+test("logicalInferUpdate 1/12", () => {
   // nn: D>Z, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'E', 'Z'];
@@ -448,7 +448,7 @@ test("logical_infer_update 1/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 2/12", () => {
+test("logicalInferUpdate 2/12", () => {
   // nb: D>Y, D>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['E', 'Y', 'Z'];
@@ -473,7 +473,7 @@ test("logical_infer_update 2/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 3/12", () => {
+test("logicalInferUpdate 3/12", () => {
   // nw: X>F, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'E'];
@@ -498,7 +498,7 @@ test("logical_infer_update 3/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 4/12", () => {
+test("logicalInferUpdate 4/12", () => {
   // bn: X>E, X>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'D', 'Z'];
@@ -523,7 +523,7 @@ test("logical_infer_update 4/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 5/12", () => {
+test("logicalInferUpdate 5/12", () => {
   // bb: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['D', 'Y', 'Z'];
@@ -547,7 +547,7 @@ test("logical_infer_update 5/12", () => {
   expect(deepEqual(agg_lil, target2 )).toBe(true);
 });
 
-test("logical_infer_update 6/12", () => {
+test("logicalInferUpdate 6/12", () => {
   // bw: X>E, X>F, Y>E, Y>F
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'D'];
@@ -572,7 +572,7 @@ test("logical_infer_update 6/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 7/12", () => {
+test("logicalInferUpdate 7/12", () => {
   // wn: D>Z, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'F', 'Z'];
@@ -597,7 +597,7 @@ test("logical_infer_update 7/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 8/12", () => {
+test("logicalInferUpdate 8/12", () => {
   // wb: D>Y, D>Z, E>Y, E>Z
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['F', 'Y', 'Z'];
@@ -622,7 +622,7 @@ test("logical_infer_update 8/12", () => {
   expect(deepEqual(agg_lil, lilAdd(target2, target) )).toBe(true);
 });
 
-test("logical_infer_update 9/12", () => {
+test("logicalInferUpdate 9/12", () => {
   // ww: n.a.
   const ids1 = ['D', 'E', 'F'];
   const ids2 = ['X', 'Y', 'F'];
@@ -646,7 +646,7 @@ test("logical_infer_update 9/12", () => {
   expect(deepEqual(agg_lil, target2 )).toBe(true);
 });
 
-test("logical_infer_update 10/12", () => {
+test("logicalInferUpdate 10/12", () => {
   const stateids = ['abc', 'def', 'ghi', 'jkl'];
   const combostates = [0, 0, 2, 1]
 
@@ -663,7 +663,7 @@ test("logical_infer_update 10/12", () => {
     direct_lil)).toBe(true);
 });
 
-test("logical_infer_update 11/12", () => {
+test("logicalInferUpdate 11/12", () => {
   const stateids = ['abc', 'def', 'ghi', 'jkl'];
   const combostates = [0, 0, 2, 1]
 
@@ -686,7 +686,7 @@ test("logical_infer_update 11/12", () => {
     direct_lil)).toBe(true);
 });
 
-test("logical_infer_update 12/12", () => {
+test("logicalInferUpdate 12/12", () => {
   // scenario
   var stateids = [];
   var combostates = [];
