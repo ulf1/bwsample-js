@@ -70,48 +70,19 @@ const sample = (examples,
  *  Example:
  *  --------
  *    var arrs = [[1, 2, 3], [4, 5, 6]]
- *    var n_sets = 2
- *    var n_items = 3
- *    var out = shuffleSubarrs(arrs, n_sets, n_items)
+ *    var out = shuffleSubarrs(arrs)
  */
-const shuffleSubarrs = (arrs, n_sets=undefined, n_items=undefined) => {
-    if (n_sets === undefined){
-        n_sets = arrs.length;
+const shuffleSubarrs = (arrs) => {
+  arrs.forEach((a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
     }
-    if (n_items === undefined){
-        n_items = arrs[0].length;
-    }
-    
-    // random indicies
-    const randInt = (max) => Math.trunc(Math.random() * max)
-
-    var rj = [];
-    var rk = [];
-    for(var i = 0; i < n_sets; i++){
-      rj.push(randInt(n_items - 1) + 1);  // idx=(1, n_items-1)
-      rk.push(randInt(n_items - 2));  // idx=(0, n_items-2)
-    }
-
-    // swap elements
-    var j, k, tmp;
-    for(var i = 0; i < n_sets; i++){
-      j = rj[i];
-      k = rk[i];
-      // swap
-      tmp = arrs[i][j];
-      arrs[i][j] = arrs[i][0];
-      arrs[i][0] = tmp;
-      // swap again
-      if( j != k ){
-        tmp = arrs[i][k];
-        arrs[i][k] = arrs[i][-1];
-        arrs[i][-1] = tmp;
-      }
-    }
-
-    // done
-    return arrs;
+    return a;
+  })
+  return arrs;
 }
+
 
 
 /**
@@ -169,7 +140,7 @@ const indicesOverlap = (n_sets,
 
     // shuffle each BWS set
     if (shuffle){
-      bwsindices = shuffleSubarrs(bwsindices, n_sets, n_items);
+      bwsindices = shuffleSubarrs(bwsindices);
     }
 
     // done
@@ -232,7 +203,7 @@ const indicesTwice = (n_sets,
 
     // (C) Shuffle here
     if (shuffle){
-      bwsindices = shuffleSubarrs(bwsindices, n_sets, n_items);
+      bwsindices = shuffleSubarrs(bwsindices);
     }
 
     // done
