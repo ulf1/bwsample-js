@@ -167,7 +167,7 @@ const indicesTwice = (n_sets,
                        n_items,
                        shuffle = true) => {
     // (A) Call `indicesOverlap` without randomness!
-    const [ bwsindices, n_examples ] = indicesOverlap(n_sets, n_items, false);
+    var [ bwsindices, n_examples ] = indicesOverlap(n_sets, n_items, false);
 
     if (n_items <= 2 && n_sets <= 1){
         return [ bwsindices, n_examples ]
