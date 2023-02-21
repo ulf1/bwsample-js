@@ -165,7 +165,7 @@ const indicesOverlap = (n_sets,
     for(var k = 0; k < n_examples; k += (n_items - 1) ){
       bwsindices.push( pool.slice(k, k + n_items) );
     }
-    bwsindices[bwsindices.length - 1].push(bwsindices[0][0]);
+    bwsindices[bwsindices.length - 1][bwsindices[0].length - 1] = bwsindices[0][0];
 
     // shuffle each BWS set
     if (shuffle){
